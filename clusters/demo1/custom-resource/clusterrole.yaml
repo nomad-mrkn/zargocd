@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: argocd-manager-watcher
+  name: argocd-manager-role
 rules:
   - apiGroups: ["admissionregistration.k8s.io", "apiregistration.k8s.io", "apps", "autoscaling.k8s.io", "autoscaling", "batch", "cert-manager.io", "extensions", "flowcontrol.apiserver.k8s.io", "grafana.integreatly.org", "jaegertracing.io", "keda.sh", "monitoring.coreos.com", "networking.k8s.io", "operator.victoriametrics.com", "policy", "rbac.authorization.k8s.io", "ricoberger.de", "", "velero.io"]
     resources:
