@@ -70,6 +70,7 @@ spec:
         path: '{{.path.path}}'
         directory:
           recurse: true
+          ignore: "infr-apps"
       syncPolicy:
         automated:
           prune: true
