@@ -2,14 +2,14 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   labels:
-    app.kubernetes.io/instance: kind-spoke-1-install-all
-  name: kind-spoke-1-install-all
+    app.kubernetes.io/instance: k8s-spb2-backend1-install-all
+  name: k8s-spb2-backend1-install-all
   namespace: argocd
 spec:
   generators:
     - list:
         elements:
-        - cluster: kind-spoke-1
+        - cluster: k8s-spb2-backend1
           url: https://spoke-1-control-plane:6443
   syncPolicy:
     preserveResourcesOnDeletion: true
@@ -21,7 +21,7 @@ spec:
     spec:
       destination:
         server: 'https://kubernetes.default.svc'
-      project: kind-spoke-1
+      project: k8s-spb2-backend1
       source:
         directory:
           recurse: true

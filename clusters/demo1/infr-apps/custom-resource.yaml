@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kind-spoke-1-custom-resource
+  name: k8s-spb2-backend1-custom-resource
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "1"
@@ -11,9 +11,9 @@ spec:
       prune: false
     syncOptions:
     - FailOnSharedResource=false
-  project: kind-spoke-1
+  project: k8s-spb2-backend1
   destination:
-    name: kind-spoke-1
+    name: k8s-spb2-backend1
     namespace: kube-system
   source:
       repoURL: 'https://github.com/nomad-mrkn/zargocd.git'

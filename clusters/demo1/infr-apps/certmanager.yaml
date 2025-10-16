@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cert-manager
+  name: k8s-spb2-backend1-certmanager
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "2"
@@ -9,10 +9,9 @@ spec:
   syncPolicy:
     automated:
       prune: false
-      selfHeal: false
     syncOptions:
     - CreateNamespace=true
-  project: default
+  project: k8s-spb2-backend1
   destination:
     server: https://spoke-1-control-plane:6443
     namespace: cert-manager
