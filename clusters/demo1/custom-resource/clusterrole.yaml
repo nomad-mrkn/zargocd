@@ -34,7 +34,7 @@ rules:
     - vmservicescrapes
     - poddisruptionbudgets
     - podsecuritypolicies
-    - clusterrolebindings
+    # - clusterrolebindings
     - clusterroles
     - rolebindings
     - roles
@@ -53,11 +53,10 @@ rules:
   - apiGroups: [""]
     resources: ["events"]
     verbs: ["create", "list"]
-  # Rule to allow management of the temporary hook binding
+  # Rule to allow creation and deletion of the hook binding
   - apiGroups: ["rbac.authorization.k8s.io"]
     resources: ["clusterrolebindings"]
-    resourceNames: ["argocd-manager-temporary-admin-hook"]
-    verbs: ["create", "update", "patch", "delete"]
+    verbs: ["create", "delete"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
