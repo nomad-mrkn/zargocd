@@ -58,7 +58,7 @@ spec:
     metadata:
       labels:
         cluster: '{{.path.basename}}'
-      name: '{{.path.basename}}-install-all' 
+      name: '{{.path.basename}}-appset-app' 
       namespace: argocd
     spec:
       destination:
@@ -67,7 +67,9 @@ spec:
       source:
         repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
         targetRevision: HEAD
-        path: '{{.path.path}}/appset.yaml'
+        path: '{{.path.path}}'
+        directory:
+          recurse: true
       syncPolicy:
         automated:
           prune: true
