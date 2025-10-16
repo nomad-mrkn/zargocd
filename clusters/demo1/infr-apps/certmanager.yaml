@@ -4,17 +4,18 @@ metadata:
   name: cert-manager
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   syncPolicy:
     automated:
-      prune: true
-      selfHeal: true
+      prune: false
+      selfHeal: false
     syncOptions:
     - CreateNamespace=true
-  project: default
+    - FailOnSharedResource=false
+  project: kind-spoke-1
   destination:
-    server: https://spoke-1-control-plane:6443
+    name: kind-spoke-1
     namespace: cert-manager
   source:
     repoURL: 'https://github.com/nomad-mrkn/charts.git'
