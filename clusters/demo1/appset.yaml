@@ -21,7 +21,7 @@ spec:
     spec:
       destination:
         server: 'https://kubernetes.default.svc'
-      project: default
+      project: kind-spoke-1
       source:
         directory:
           recurse: true
