@@ -20,7 +20,7 @@ spec:
     metadata:
       labels:
         cluster: '{{.path.basename}}'
-      name: '{{.path.basename}}-appset-app' 
+      name: '{{.path.basename}}-install-all' 
       namespace: argocd
     spec:
       destination:

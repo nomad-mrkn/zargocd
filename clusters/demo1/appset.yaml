@@ -2,8 +2,8 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   labels:
-    app.kubernetes.io/instance: kind-spoke-1
-  name: kind-spoke-1
+    app.kubernetes.io/instance: kind-spoke-1-install-all
+  name: kind-spoke-1-install-all
   namespace: argocd
 spec:
   generators:
