@@ -52,6 +52,7 @@ rules:
     - persistentvolumeclaims
     - persistentvolumes
     - storageclasses
+    - csistoragecapacities
     verbs: ["get", "list", "watch"]
   - apiGroups: [""]
     resources: ["events"]
