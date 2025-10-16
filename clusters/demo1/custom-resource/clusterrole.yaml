@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: argocd-manager-role
+  name: argocd-manager-watcher
 rules:
   - apiGroups: ["admissionregistration.k8s.io", "apiregistration.k8s.io", "apps", "autoscaling.k8s.io", "autoscaling", "batch", "cert-manager.io", "extensions", "flowcontrol.apiserver.k8s.io", "grafana.integreatly.org", "jaegertracing.io", "keda.sh", "monitoring.coreos.com", "networking.k8s.io", "operator.victoriametrics.com", "policy", "rbac.authorization.k8s.io", "ricoberger.de", "", "velero.io"]
     resources:
@@ -34,7 +34,7 @@ rules:
     - vmservicescrapes
     - poddisruptionbudgets
     - podsecuritypolicies
-    # - clusterrolebindings
+    - clusterrolebindings
     - clusterroles
     - rolebindings
     - roles
@@ -53,10 +53,6 @@ rules:
   - apiGroups: [""]
     resources: ["events"]
     verbs: ["create", "list"]
-  # Rule to allow creation and deletion of the hook binding
-  - apiGroups: ["rbac.authorization.k8s.io"]
-    resources: ["clusterrolebindings"]
-    verbs: ["create", "delete"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
