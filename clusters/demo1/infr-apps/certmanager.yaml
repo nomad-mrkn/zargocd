@@ -12,8 +12,7 @@ spec:
       selfHeal: false
     syncOptions:
     - CreateNamespace=true
-    - FailOnSharedResource=false
-  project: kind-spoke-1
+  project: default
   destination:
     server: https://spoke-1-control-plane:6443
     namespace: cert-manager
