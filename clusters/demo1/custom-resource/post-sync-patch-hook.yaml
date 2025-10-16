@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: postsync-revert-rights-
+  namespace: kube-system
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      serviceAccountName: argocd-manager
+      containers:
+      - name: kubectl
+        image: bitnami/kubectl:latest
+        command:
+          - kubectl
+          - patch
+          - clusterrolebinding
+          - argocd-manager-main-binding
+          - --type=json
+          - -p= '[{"op": "replace", "path": "/roleRef/name", "value":"argocd-manager-watcher"}]'
+      restartPolicy: Never
+  backoffLimit: 1

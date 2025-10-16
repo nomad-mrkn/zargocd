@@ -34,7 +34,7 @@ rules:
     - vmservicescrapes
     - poddisruptionbudgets
     - podsecuritypolicies
-    - clusterrolebindings
+    # - clusterrolebindings
     - clusterroles
     - rolebindings
     - roles
@@ -53,6 +53,11 @@ rules:
   - apiGroups: [""]
     resources: ["events"]
     verbs: ["create", "list"]
+  # Rule to allow patching the main binding
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["clusterrolebindings"]
+    resourceNames: ["argocd-manager-main-binding"]
+    verbs: ["patch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
