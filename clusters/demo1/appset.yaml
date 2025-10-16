@@ -60,7 +60,7 @@ spec:
       source:
         directory:
           recurse: true
-        path: zargocd/clusters/demo1/infr-apps
+        path: clusters/demo1/infr-apps
         repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
         targetRevision: HEAD
       syncPolicy:
