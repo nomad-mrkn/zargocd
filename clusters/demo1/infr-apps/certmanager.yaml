@@ -15,7 +15,7 @@ spec:
     - FailOnSharedResource=false
   project: kind-spoke-1
   destination:
-    name: kind-spoke-1
+    server: https://spoke-1-control-plane:6443
     namespace: cert-manager
   source:
     repoURL: 'https://github.com/nomad-mrkn/charts.git'
