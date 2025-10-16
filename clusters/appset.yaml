@@ -2,8 +2,8 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   labels:
-    app.kubernetes.io/instance: u-spb2-prod-appset
-  name: u-spb2-prod-appset
+    app.kubernetes.io/instance: ru-spb2-prod-appset
+  name: ru-spb2-prod-appset
   namespace: argocd
 spec:
   goTemplate: true
