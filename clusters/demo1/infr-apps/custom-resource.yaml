@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kind-spoke-1-custom-resource
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  syncPolicy:
+    automated:
+      prune: false
+    syncOptions:
+    - FailOnSharedResource=false
+  project: kind-spoke-1
+  destination:
+    name: kind-spoke-1
+    namespace: kube-system
+  source:
+      repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+      targetRevision: master
+      path: clusters/demo1/custom-resource
