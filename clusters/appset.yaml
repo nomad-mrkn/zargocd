@@ -29,7 +29,7 @@ spec:
       source:
         repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
         targetRevision: HEAD
-        path: '{{.path.path}}'
+        path: '{{.path.path}}/infr-apps'
         directory:
           recurse: true
       syncPolicy:
