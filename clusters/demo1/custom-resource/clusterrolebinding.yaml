@@ -1,12 +1,11 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  # This is the permanent binding that we will patch
-  name: argocd-manager-main-binding
+  name: argocd-manager-watcher
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: argocd-manager-watcher # Default to the watcher role
+  name: argocd-manager-watcher
 subjects:
   - kind: ServiceAccount
     name: argocd-manager
