@@ -1,0 +1,74 @@
+# apiVersion: argoproj.io/v1alpha1
+# kind: ApplicationSet
+# metadata:
+#   labels:
+#     app.kubernetes.io/instance: ru-spb2-prod-appset
+#   name: ru-spb2-prod-appset
+#   namespace: argocd
+# spec:
+#   goTemplate: true
+#   goTemplateOptions: ["missingkey=error"]
+#   generators:
+#   - git:
+#       repoURL: 'https://bitbucket.playteam.ru/scm/devops/k8s-configs.git'
+#       revision: master
+#       directories:
+#       - path: argocd/clusters/ru_spb2/prod/*
+#   syncPolicy:
+#     preserveResourcesOnDeletion: true
+#   template:
+#     metadata:
+#       labels:
+#         cluster: '{{.path.basename}}'
+#       name: '{{.path.basename}}-install-all'
+#     spec:
+#       destination:
+#         server: 'https://kubernetes.default.svc'
+#       project: default #error validating ApplicationSets: the Argo CD API does not currently support creating ApplicationSets with templated `project` fields
+#       source:
+#         directory:
+#           recurse: true
+#         path: '{{.path.path}}/infr-apps'
+#         repoURL: 'https://bitbucket.playteam.ru/scm/devops/k8s-configs.git'
+#         targetRevision: master
+#       syncPolicy:
+#         automated:
+#           prune: false
+#           selfHeal: false
+
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  labels:
+    app.kubernetes.io/instance: demo-cluster-appset
+  name: demo-cluster-appset
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+  - git:
+      repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+      revision: HEAD
+      directories:
+      - path: clusters/demo*
+  syncPolicy:
+    preserveResourcesOnDeletion: true
+  template:
+    metadata:
+      labels:
+        cluster: '{{.path.basename}}'
+      name: '{{.path.basename}}-install-all' 
+      namespace: argocd
+    spec:
+      destination:
+        server: 'https://kubernetes.default.svc'
+      project: default
+      source:
+        repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+        targetRevision: HEAD
+        path: '{{.path.path}}/appset.yaml'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true

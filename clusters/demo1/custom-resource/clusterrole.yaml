@@ -1,0 +1,237 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: monitoring-group
+rules:
+  - verbs:
+      - get
+      - list
+      - watch
+    apiGroups:
+      - ''
+    resources:
+      - pods
+      - pods/status
+      - services
+      - services/status
+  - verbs:
+      - get
+      - list
+      - watch
+    apiGroups:
+      - ''
+    resources:
+      - namespaces
+  - verbs:
+      - get
+      - list
+      - watch
+      - patch
+    apiGroups:
+      - apps
+    resources:
+      - controllerrevisions
+      - daemonsets
+      - daemonsets/status
+      - deployments
+      - deployments/status
+      - replicasets
+      - replicasets/status
+      - statefulsets
+      - statefulsets/status
+  - verbs:
+      - get
+      - list
+      - watch
+    apiGroups:
+      - autoscaling
+    resources:
+      - horizontalpodautoscalers
+      - horizontalpodautoscalers/status
+  - verbs:
+      - get
+      - list
+      - watch
+    apiGroups:
+      - extensions
+    resources:
+      - daemonsets
+      - daemonsets/status
+      - deployments
+      - deployments/scale
+      - deployments/status
+      - ingresses
+      - ingresses/status
+      - networkpolicies
+      - replicasets
+      - replicasets/scale
+      - replicasets/status
+      - replicationcontrollers/scale
+  - verbs:
+      - get
+      - list
+      - watch
+    apiGroups:
+      - networking.k8s.io
+    resources:
+      - ingresses
+      - ingresses/status
+      - networkpolicies
+  - verbs:
+      - delete
+      - patch
+      - update
+    apiGroups:
+      - ''
+    resources:
+      - pods
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: Kubernetes_RBAC_Audit_CS_prod
+rules:
+  - verbs:
+      - get
+      - list
+      - watch
+    apiGroups:
+      - 'rbac.authorization.k8s.io'
+    resources:
+      - '*'
+  - verbs:
+      - get
+      - list
+      - watch
+    apiGroups:
+      - ''
+    resources:
+      - serviceaccounts
+      - namespaces
+  - verbs:
+      - create
+    apiGroups:
+      - 'authorization.k8s.io'
+    resources:
+      - '*'
+  - verbs:
+      - get
+      - list
+      - watch
+    apiGroups:
+      - 'apiextensions.k8s.io'
+    resources:
+      - customresourcedefinitions
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argocd-manager-watcher
+rules:
+  - apiGroups: ["admissionregistration.k8s.io", "apiregistration.k8s.io", "apps", "autoscaling.k8s.io", "autoscaling", "batch", "cert-manager.io", "extensions", "flowcontrol.apiserver.k8s.io", "grafana.integreatly.org", "jaegertracing.io", "keda.sh", "monitoring.coreos.com", "networking.k8s.io", "operator.victoriametrics.com", "policy", "rbac.authorization.k8s.io", "ricoberger.de", "", "velero.io"]
+    resources:
+    - mutatingwebhookconfigurations
+    - validatingwebhookconfigurations
+    - apiservices
+    - daemonsets
+    - deployments
+    - statefulsets
+    - verticalpodautoscalers
+    - horizontalpodautoscalers
+    - cronjobs
+    - jobs
+    - certificates
+    - issuers
+    - ingresses
+    - flowschemas
+    - prioritylevelconfigurations
+    - grafanadashboards
+    - jaegers
+    - scaledobjects
+    - podmonitors
+    - prometheusrules
+    - servicemonitors
+    - ingressclasses
+    - networkpolicies
+    - vmagents
+    - vmnodescrapes
+    - vmpodscrapes
+    - vmservicescrapes
+    - poddisruptionbudgets
+    - podsecuritypolicies
+    - clusterrolebindings
+    - clusterroles
+    - rolebindings
+    - roles
+    - vaultsecrets
+    - configmaps
+    - endpoints
+    - namespaces
+    - pods
+    - secrets
+    - serviceaccounts
+    - services
+    - backupstoragelocations
+    - schedules
+    - volumesnapshotlocations
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argocd-manager-full
+  labels:
+    prune: "true"
+rules:
+  - apiGroups: ["admissionregistration.k8s.io", "apiextensions.k8s.io", "apiregistration.k8s.io", "apps", "autoscaling.k8s.io", "autoscaling", "batch", "cert-manager.io", "extensions", "flowcontrol.apiserver.k8s.io", "grafana.integreatly.org", "jaegertracing.io", "keda.sh", "monitoring.coreos.com", "networking.k8s.io", "operator.victoriametrics.com", "policy", "rbac.authorization.k8s.io", "ricoberger.de", "", "velero.io"]
+    resources:
+    - mutatingwebhookconfigurations
+    - validatingwebhookconfigurations
+    - customresourcedefinitions
+    - apiservices
+    - daemonsets
+    - deployments
+    - statefulsets
+    - verticalpodautoscalers
+    - horizontalpodautoscalers
+    - cronjobs
+    - jobs
+    - certificates
+    - issuers
+    - ingresses
+    - flowschemas
+    - prioritylevelconfigurations
+    - grafanadashboards
+    - jaegers
+    - scaledobjects
+    - podmonitors
+    - prometheusrules
+    - servicemonitors
+    - ingressclasses
+    - networkpolicies
+    - vmagents
+    - vmnodescrapes
+    - vmpodscrapes
+    - vmservicescrapes
+    - poddisruptionbudgets
+    - podsecuritypolicies
+    - clusterrolebindings
+    - clusterroles
+    - rolebindings
+    - roles
+    - vaultsecrets
+    - configmaps
+    - endpoints
+    - namespaces
+    - pods
+    - secrets
+    - serviceaccounts
+    - services
+    - backupstoragelocations
+    - schedules
+    - volumesnapshotlocations
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]

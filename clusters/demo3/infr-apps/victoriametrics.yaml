@@ -1,0 +1,202 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: k8s-spb2-backend1-victoriametrics
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false
+  project: k8s-spb2-backend1
+  destination:
+    name: k8s-spb2-backend1
+    namespace: kube-system
+  source:
+    repoURL: 'https://artifactory.playteam.ru:443/artifactory/helm/'
+    targetRevision: 0.28.0-okko-v2
+    chart: victoria-metrics-operator
+    helm:
+      releaseName:  victoriametrics
+      valuesObject:
+        #values.yaml
+        image:
+          repository: registry.playteam.ru/victoriametrics/operator
+          tag: v0.41.1
+        env:
+          - name: VM_VMAGENTDEFAULT_CONFIGRELOADIMAGE
+            value: "registry.playteam.ru/prometheus/prometheus-config-reloader:v0.68.0"
+        vmagent:
+          externalLabels:
+            datacenter: "ru_spb2"
+            cluster_name: "k8s-spb2-backend1"
+            cluster: "k8s-spb2-backend1"
+          remoteWrite:
+            - url: "http://victoriametrics.spb.play.dc:8480/insert/0/prometheus/api/v1/write"
+          image:
+            repository: registry.playteam.ru/victoriametrics/vmagent
+            tag: v1.97.1
+          shardCount: 3
+          tolerations:
+          - key: "node-role.kubernetes.io/infr"
+            operator: "Exists"
+            effect: "NoSchedule"
+          affinity:
+            nodeAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 1
+                  preference:
+                    matchExpressions:
+                    - key: "node-role.kubernetes.io/infr"
+                      operator: "Exists"
+          tmpData: 
+            enabled: true
+            path: "/tmp"
+          extraArgs:
+            promscrape.maxScrapeSize: "62914560"
+            remoteWrite.tmpDataPath: "/tmp"
+            remoteWrite.maxDiskUsagePerURL: "50GB"
+        tolerations:
+        - key: "node-role.kubernetes.io/infr"
+          operator: "Exists"
+          effect: "NoSchedule"
+        affinity:
+          nodeAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+              - weight: 1
+                preference:
+                  matchExpressions:
+                  - key: "node-role.kubernetes.io/infr"
+                    operator: "Exists"
+        kube-state-metrics:
+          enabled: true
+          prometheus:
+            monitor:
+              enabled: false
+          image:
+            repository: registry.playteam.ru/prometheus/kube-state-metrics
+            tag: v2.9.2
+            sha: ""
+            pullPolicy: IfNotPresent
+          tolerations:
+            - key: "node-role.kubernetes.io/infr"
+              operator: "Exists"
+              effect: "NoSchedule"
+          affinity:
+            nodeAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 1
+                  preference:
+                    matchExpressions:
+                    - key: "node-role.kubernetes.io/infr"
+                      operator: "Exists"
+        prometheus-node-exporter:
+          enabled: true
+          image:
+            repository: registry.playteam.ru/prometheus/node-exporter
+            tag: v1.3.1-469
+            sha: ""
+            pullPolicy: IfNotPresent
+          prometheus:
+            monitor:
+              enabled: false
+          vmServiceScrape:
+            enabled: true
+            spec:
+              jobLabel: jobLabel
+              endpoints:
+                - port: metrics
+                  path: /metrics
+                  relabelConfigs:
+                    - action: replace
+                      sourceLabels: [__meta_kubernetes_pod_node_name]
+                      separator: ;
+                      regex: ^(.*)$
+                      targetLabel: nodename
+                      replacement: $1
+                    - action: replace
+                      sourceLabels: [__meta_kubernetes_pod_node_name]
+                      separator: ;
+                      regex: ^(.*)$
+                      targetLabel: instance
+                      replacement: $1
+                  metricRelabelConfigs:
+                    - action: drop
+                      source_labels: [mountpoint]
+                      regex: "/var/lib/kubelet/pods.+"
+          tolerations:
+            - key: "node-role.kubernetes.io/infr"
+              operator: "Exists"
+              effect: "NoSchedule"
+            - key: "node-role.kubernetes.io/control-plane"
+              operator: "Exists"
+              effect: "NoSchedule"
+          affinity:
+            nodeAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 1
+                  preference:
+                    matchExpressions:
+                    - key: "node-role.kubernetes.io/infr"
+                      operator: "Exists"
+        kubeEtcd:
+          enabled: true
+          service:
+            enabled: true
+            port: 2381
+            targetPort: 2381
+          endpoints:
+            - 10.7.14.145
+            - 10.7.14.225
+            - 10.7.14.173
+            - 10.7.14.174
+            - 10.7.14.241
+          spec:
+            jobLabel: kube-etcd
+            endpoints:
+              - port: http-metrics
+                path: /metrics
+                scheme: http
+                tlsConfig:
+                  caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        coreDns:
+          enabled: true
+          service:
+            enabled: false
+          spec:
+            selector:
+              matchLabels:
+                k8s-app: kube-dns
+                kubernetes.io/name: CoreDNS
+            namespaceSelector:
+              matchNames:
+                - "kube-system"
+            jobLabel: coredns
+            endpoints:
+              - port: metrics
+                path: /metrics
+        kubeControllerManager:
+          enabled: true
+          endpoints:
+            - 10.7.14.145
+            - 10.7.14.225
+            - 10.7.14.173
+            - 10.7.14.174
+            - 10.7.14.241
+        kubeScheduler:
+          enabled: true
+          endpoints:
+            - 10.7.14.145
+            - 10.7.14.225
+            - 10.7.14.173
+            - 10.7.14.174
+            - 10.7.14.241
+        kubeApiServer:
+          enabled: true
+        metrics-server:
+          enabled: true
+          image:
+            repository: registry.playteam.ru/talos/metrics-server
+            tag: "0.6.2-664"

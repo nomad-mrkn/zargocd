@@ -1,0 +1,69 @@
+# apiVersion: argoproj.io/v1alpha1
+# kind: ApplicationSet
+# metadata:
+#   labels:
+#     app.kubernetes.io/instance: k8s-spb2-backend1-install-all
+#   name: k8s-spb2-backend1-install-all
+#   namespace: argocd
+# spec:
+#   generators:
+#     - list:
+#         elements:
+#         - cluster: k8s-spb2-backend1
+#           url: https://k8s-spb2-backend1-api.spb2.dc:8002
+#   syncPolicy:
+#     preserveResourcesOnDeletion: true
+#   template:
+#     metadata:
+#       labels:
+#         cluster: '{{cluster}}'
+#       name: '{{cluster}}-install-all'
+#     spec:
+#       destination:
+#         server: 'https://kubernetes.default.svc'
+#       project: k8s-spb2-backend1
+#       source:
+#         directory:
+#           recurse: true
+#         path: argocd/clusters/ru_spb2/prod/k8s-spb2-backend1/infr-apps
+#         repoURL: 'https://bitbucket.playteam.ru/scm/devops/k8s-configs.git'
+#         targetRevision: master
+#       syncPolicy:
+#         automated:
+#           prune: false
+#           selfHeal: false
+
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  labels:
+    app.kubernetes.io/instance: k8s-spb2-backend1-install-all
+  name: k8s-spb2-backend1-install-all
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+        - cluster: kind-spoke-1
+          url: https://spoke-1-control-plane:6443
+  syncPolicy:
+    preserveResourcesOnDeletion: true
+  template:
+    metadata:
+      labels:
+        cluster: '{{cluster}}'
+      name: '{{cluster}}-install-all'
+    spec:
+      destination:
+        server: '{{url}}'
+      project: default
+      source:
+        directory:
+          recurse: true
+        path: zargocd/clusters/demo1/infr-apps
+        repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+        targetRevision: HEAD
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
