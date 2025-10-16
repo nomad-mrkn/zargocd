@@ -20,7 +20,7 @@ spec:
       name: '{{cluster}}-install-all'
     spec:
       destination:
-        server: '{{url}}'
+        server: 'https://kubernetes.default.svc'
       project: default
       source:
         directory:
