@@ -16,7 +16,7 @@ spec:
   destinations:
   - server: 'https://spoke-1-control-plane:6443'
     namespace: '*'
-  # Разрешаем развертывание любых видов ресурсов
+  # Явно разрешаем управление глобальными ресурсами (на уровне кластера)
   clusterResourceWhitelist:
   - group: '*'
-    kind: ''
+    kind: '*'
