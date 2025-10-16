@@ -19,6 +19,7 @@ spec:
           - clusterrolebinding
           - argocd-manager-main-binding
           - --type=json
-          - -p= '[{"op": "replace", "path": "/roleRef/name", "value":"argocd-manager-watcher"}]'
+          - -p
+          - '[{"op": "replace", "path": "/roleRef/name", "value":"argocd-manager-watcher"}]'
       restartPolicy: Never
   backoffLimit: 1
