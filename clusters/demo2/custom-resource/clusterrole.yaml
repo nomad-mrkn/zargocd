@@ -34,7 +34,7 @@ rules:
     - vmservicescrapes
     - poddisruptionbudgets
     - podsecuritypolicies
-    # - clusterrolebindings
+    - clusterrolebindings
     - clusterroles
     - rolebindings
     - roles
