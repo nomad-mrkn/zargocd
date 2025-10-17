@@ -14,7 +14,7 @@ spec:
     - FailOnSharedResource=false
   project: k8s-spb2-backend3
   destination:
-    name: k8s-spb2-backend3
+    name: default
     namespace: cert-manager
   sources:
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'

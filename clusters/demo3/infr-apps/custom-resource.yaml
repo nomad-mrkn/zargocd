@@ -11,9 +11,9 @@ spec:
       prune: false
     syncOptions:
     - FailOnSharedResource=false
-  project: k8s-spb2-backend3
+  project: delault
   destination:
-    name: k8s-spb2-backend3
+    name: kind-spoke-3
     namespace: kube-system
   sources:
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'

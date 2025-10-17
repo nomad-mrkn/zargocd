@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: k8s-spb2-backend3
+  namespace: argocd
+spec:
+  description: Project for demo3 cluster
+  sourceRepos:
+    - https://github.com/nomad-mrkn/*
+  destinations:
+    - name: k8s-spb2-backend3
+      namespace: '*'
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  orphanedResources:
+    warn: false
