@@ -8,7 +8,7 @@ metadata:
 spec:
   project: k8s-spb2-backend3
   destination:
-    server: https://spoke-3-control-plane:6443
+    name: kind-spoke-3
     namespace: kube-system
   source:
     repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
