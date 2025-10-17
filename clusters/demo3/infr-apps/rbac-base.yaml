@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: k8s-spb2-backend3-rbac-base
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: k8s-spb2-backend3
+  destination:
+    name: k8s-spb2-backend3
+    namespace: kube-system
+  source:
+    repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+    targetRevision: HEAD
+    path: shared/jit-rbac-base
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false
