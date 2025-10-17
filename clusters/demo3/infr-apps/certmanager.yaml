@@ -11,10 +11,9 @@ spec:
       prune: false
     syncOptions:
     - CreateNamespace=true
-    - FailOnSharedResource=false
   project: default
   destination:
-    name: https://spoke-3-control-plane:6443
+    server: https://spoke-3-control-plane:6443
     namespace: cert-manager
   sources:
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
