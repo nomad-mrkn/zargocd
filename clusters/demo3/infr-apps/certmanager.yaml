@@ -12,9 +12,9 @@ spec:
     syncOptions:
     - CreateNamespace=true
     - FailOnSharedResource=false
-  project: k8s-spb2-backend3
+  project: default
   destination:
-    name: default
+    name: https://spoke-3-control-plane:6443
     namespace: cert-manager
   sources:
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
