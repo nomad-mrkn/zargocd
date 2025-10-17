@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: k8s-spb2-backend1-certmanager
+  name: k8s-spb2-backend2-certmanager
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "2"
@@ -13,7 +13,7 @@ spec:
     - CreateNamespace=true
   project: default
   destination:
-    server: https://spoke-1-control-plane:6443
+    server: https://spoke-2-control-plane:6443
     namespace: cert-manager
   source:
     repoURL: 'https://github.com/nomad-mrkn/charts.git'
