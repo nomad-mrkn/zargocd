@@ -21,6 +21,7 @@ rules:
       - cronjobs
       - jobs
       - certificates
+      - certificaterequests
       - issuers
       - ingresses
       - flowschemas
