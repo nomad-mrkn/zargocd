@@ -74,3 +74,6 @@ rules:
   - apiGroups: ["rbac.authorization.k8s.io"]
     resources: ["clusterroles"]
     verbs: ["create","escalate"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["delete"]    
