@@ -12,6 +12,7 @@ spec:
     syncOptions:
     - CreateNamespace=true
     - FailOnSharedResource=false
+    - Validate=false
   project: default
   destination:
     name: kind-spoke-2
