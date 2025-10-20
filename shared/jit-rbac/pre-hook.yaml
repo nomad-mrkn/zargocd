@@ -4,7 +4,7 @@ metadata:
   generateName: argocd-manager-full-
   annotations:
     argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookFailed,HookSucceeded
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookFailed
     argocd.argoproj.io/sync-wave: "-1"
   labels:
     app.kubernetes.io/part-of: argo-jit-rbac
