@@ -14,7 +14,6 @@ rules:
     - verticalpodautoscalers
     - horizontalpodautoscalers
     - cronjobs
-    - jobs
     - certificates
     - issuers
     - ingresses
