@@ -27,6 +27,4 @@ spec:
           - |
             echo "Deleting temporary CRBs with label app.kubernetes.io/part-of=argo-jit-rbac";
             kubectl delete clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac --ignore-not-found=true;
-            echo "Deleting ephemeral ClusterRole argocd-manager-full (if present)";
-            kubectl delete clusterrole argocd-manager-full --ignore-not-found=true;
             echo "Done";
