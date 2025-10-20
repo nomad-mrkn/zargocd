@@ -13,7 +13,6 @@ spec:
     - CreateNamespace=true
     - FailOnSharedResource=false
     - Validate=false
-    - FailOnSharedResource=false
   project: default
   destination:
     name: kind-spoke-1
