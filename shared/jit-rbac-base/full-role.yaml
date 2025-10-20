@@ -56,4 +56,3 @@ rules:
       - schedules
       - volumesnapshotlocations
     verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
-
