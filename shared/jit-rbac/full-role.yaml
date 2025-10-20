@@ -3,6 +3,7 @@ kind: ClusterRole
 metadata:
   name: argocd-manager-full
   annotations:
+    argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/sync-wave: "-2"
   labels:
     app.kubernetes.io/part-of: argo-jit-rbac
@@ -56,3 +57,4 @@ rules:
       - schedules
       - volumesnapshotlocations
     verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+

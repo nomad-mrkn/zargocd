@@ -67,3 +67,7 @@ rules:
     resources: ["clusterroles"]
     resourceNames: ["argocd-manager-full"]
     verbs: ["bind"]
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["clusterroles"]
+    resourceNames: ["argocd-manager-full"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "escalate"]
