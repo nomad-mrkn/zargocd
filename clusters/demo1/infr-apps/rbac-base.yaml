@@ -1,14 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: k8s-spb2-backend3-rbac-base
+  name: k8s-spb2-backend1-rbac-base
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "0"
 spec:
   project: default
   destination:
-    name: kind-spoke-3
+    name: kind-spoke-1
     namespace: kube-system
   source:
     repoURL: 'https://github.com/nomad-mrkn/zargocd.git'

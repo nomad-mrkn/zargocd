@@ -25,7 +25,7 @@ spec:
       source:
         directory:
           recurse: true
-        path: clusters/demo1/infr-apps
+        path: clusters/demo2/infr-apps
         repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
         targetRevision: HEAD
       syncPolicy:

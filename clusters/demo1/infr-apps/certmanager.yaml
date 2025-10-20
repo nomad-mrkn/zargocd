@@ -11,14 +11,18 @@ spec:
       prune: false
     syncOptions:
     - CreateNamespace=true
+    - FailOnSharedResource=false
   project: default
   destination:
-    server: https://spoke-1-control-plane:6443
+    name: kind-spoke-1
     namespace: cert-manager
-  source:
-    repoURL: 'https://github.com/nomad-mrkn/charts.git'
-    targetRevision: HEAD
-    path: cert-manager
-    helm:
-      values: |
-        installCRDs: true
+  sources:
+    - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+      targetRevision: HEAD
+      path: shared/jit-rbac
+    - repoURL: 'https://github.com/nomad-mrkn/charts.git'
+      targetRevision: HEAD
+      path: cert-manager
+      helm:
+        values: |
+          installCRDs: true

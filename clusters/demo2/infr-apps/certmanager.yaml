@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: k8s-spb2-backend3-certmanager1
+  name: k8s-spb2-backend2-certmanager
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "2"
@@ -11,9 +11,10 @@ spec:
       prune: false
     syncOptions:
     - CreateNamespace=true
+    - FailOnSharedResource=false
   project: default
   destination:
-    server: https://spoke-3-control-plane:6443
+    name: kind-spoke-2
     namespace: cert-manager
   sources:
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'

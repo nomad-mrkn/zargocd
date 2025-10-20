@@ -15,7 +15,10 @@ spec:
   destination:
     name: kind-spoke-2
     namespace: kube-system
-  source:
-      repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+  sources:
+    - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+      targetRevision: HEAD
+      path: shared/jit-rbac
+    - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
       path: clusters/demo2/custom-resource
