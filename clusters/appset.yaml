@@ -34,5 +34,5 @@ spec:
           recurse: true
       syncPolicy:
         automated:
-          prune: false
+          prune: true
           selfHeal: false
