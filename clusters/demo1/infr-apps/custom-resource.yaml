@@ -11,6 +11,7 @@ spec:
       prune: false
     syncOptions:
     - FailOnSharedResource=false
+    - Validate=false
   project: default
   destination:
     name: kind-spoke-1
