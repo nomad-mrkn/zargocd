@@ -4,10 +4,10 @@ metadata:
   generateName: argocd-manager-full-
   annotations:
     argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookFailed
     argocd.argoproj.io/sync-wave: "-1"
   labels:
     app.kubernetes.io/part-of: argo-jit-rbac
-    jit-rbac-app: '{{.app.name}}'
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

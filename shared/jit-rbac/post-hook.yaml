@@ -25,6 +25,6 @@ spec:
         command: ["/bin/sh","-lc"]
         args:
           - |
-            echo "Deleting temporary CRB for app $ARGOCD_APP_NAME";
-            kubectl delete clusterrolebinding -l jit-rbac-app=$ARGOCD_APP_NAME --ignore-not-found=true;
+            echo "Deleting temporary CRBs with label app.kubernetes.io/part-of=argo-jit-rbac";
+            kubectl delete clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac --ignore-not-found=true;
             echo "Done";
