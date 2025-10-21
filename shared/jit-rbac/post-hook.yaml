@@ -5,7 +5,7 @@ metadata:
   namespace: kube-system
   annotations:
     argocd.argoproj.io/hook: PostSync
-    argocd.argoproj.io/hook-delete-policy: HookSucceeded,HookFailed
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded,HookFailed
     argocd.argoproj.io/sync-wave: "99"
   labels:
     app.kubernetes.io/part-of: argo-jit-rbac
@@ -28,9 +28,16 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.labels['jit-rbac/app']
+        - name: JIT_RBAC_TTL_SECONDS
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['jit-rbac/ttl']
         command: ["/bin/sh","-lc"]
         args:
           - |
+            TTL=${JIT_RBAC_TTL_SECONDS:-60};
+            echo "Waiting ${TTL}s before revoking JIT RBAC for app=${JIT_RBAC_APP}";
+            sleep ${TTL};
             echo "Deleting temporary CRBs with label app.kubernetes.io/part-of=argo-jit-rbac";
             kubectl delete clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --ignore-not-found=true;
             echo "Deleting completed PostSync pods with label app.kubernetes.io/part-of=argo-jit-rbac";

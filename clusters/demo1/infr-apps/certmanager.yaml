@@ -24,6 +24,7 @@ spec:
         nameSuffix: -k8s-spb2-backend1-certmanager
         commonLabels:
           jit-rbac/app: k8s-spb2-backend1-certmanager
+          jit-rbac/ttl: "60"
     - repoURL: 'https://github.com/nomad-mrkn/charts.git'
       targetRevision: HEAD
       path: cert-manager
