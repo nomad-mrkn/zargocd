@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: k8s-spb2-backend3-fluent-bit
+  name: k8s-spb2-backend2-certmanager
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "2"
@@ -12,24 +12,26 @@ spec:
     syncOptions:
     - CreateNamespace=true
     - FailOnSharedResource=false
+    - Validate=false
   project: default
   destination:
-    name: kind-spoke-3
-    namespace: fluent-bit
+    name: kind-spoke-2
+    namespace: cert-manager
   sources:
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
       path: shared/jit-rbac
       kustomize:
-        nameSuffix: -k8s-spb2-backend3-fluent-bit
+        nameSuffix: -k8s-spb2-backend2-certmanager
         commonLabels:
-          jit-rbac/app: k8s-spb2-backend3-fluent-bit
+          jit-rbac/app: k8s-spb2-backend2-certmanager
     - repoURL: 'https://github.com/nomad-mrkn/charts.git'
       targetRevision: HEAD
-      path: fluent-bit
+      path: cert-manager
       helm:
+        releaseName: k8s-spb2-backend2-certmanager
         values: |
-          # Добавьте специфичные для fluent-bit значения Helm здесь, если необходимо
-          # Например:
-          # service:
-          #   type: ClusterIP
+          installCRDs: true
+          
+# startupapicheck:
+#   enabled: false

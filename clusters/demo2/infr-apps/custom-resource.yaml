@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: k8s-spb2-backend3-custom-resource
+  name: k8s-spb2-backend2-custom-resource
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "1"
@@ -14,16 +14,16 @@ spec:
     - Validate=false
   project: default
   destination:
-    name: kind-spoke-3
+    name: kind-spoke-2
     namespace: kube-system
   sources:
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
       path: shared/jit-rbac
       kustomize:
-        nameSuffix: -k8s-spb2-backend3-custom-resource
+        nameSuffix: -k8s-spb2-backend2-custom-resource
         commonLabels:
-          jit-rbac/app: k8s-spb2-backend3-custom-resource
+          jit-rbac/app: k8s-spb2-backend2-custom-resource
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
-      path: clusters/demo3/custom-resource
+      path: clusters/demo1/custom-resource

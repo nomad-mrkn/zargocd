@@ -2,17 +2,16 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   labels:
-    app.kubernetes.io/instance: k8s-spb2-backend3-install-all
-  name: k8s-spb2-backend3-install-all
+    app.kubernetes.io/instance: k8s-spb2-backend2-install-all
+  name: k8s-spb2-backend2-install-all
   namespace: argocd
 spec:
   generators:
     - list:
         elements:
-        - cluster: k8s-spb2-backend3
-          url: https://spoke-3-control-plane:6443
+        - cluster: k8s-spb2-backend2
+          url: https://spoke-2-control-plane:6443
   syncPolicy:
-    prune: true
     preserveResourcesOnDeletion: true
   template:
     metadata:
@@ -22,14 +21,14 @@ spec:
     spec:
       destination:
         server: 'https://kubernetes.default.svc'
-      project: k8s-spb2-backend1
+      project: k8s-spb2-backend2
       source:
         directory:
           recurse: true
-        path: clusters/demo3/infr-apps
+        path: clusters/demo2/infr-apps
         repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
         targetRevision: HEAD
       syncPolicy:
         automated:
-          prune: true
+          prune: false
           selfHeal: false
