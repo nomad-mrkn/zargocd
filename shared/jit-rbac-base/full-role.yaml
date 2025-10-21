@@ -56,6 +56,9 @@ rules:
       - schedules
       - volumesnapshotlocations
     verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  - apiGroups: ["argoproj.io"]
+    resources: ["applications"]
+    verbs: ["get", "list", "watch"]
   # Extra privileges needed to allow Argo to reconcile RBAC created by cert-manager Helm chart
   # - apiGroups: ["authorization.k8s.io"]
   #   resources: ["subjectaccessreviews"]
