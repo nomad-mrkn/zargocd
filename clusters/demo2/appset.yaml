@@ -12,6 +12,7 @@ spec:
         - cluster: k8s-spb2-backend2
           url: https://spoke-2-control-plane:6443
   syncPolicy:
+    prune: true
     preserveResourcesOnDeletion: true
   template:
     metadata:
@@ -25,10 +26,10 @@ spec:
       source:
         directory:
           recurse: true
-        path: clusters/demo2/infr-apps
+        path: clusters/demo1/infr-apps
         repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
         targetRevision: HEAD
       syncPolicy:
         automated:
-          prune: false
+          prune: true
           selfHeal: false
