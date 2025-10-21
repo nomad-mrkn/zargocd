@@ -11,6 +11,7 @@ rules:
     - daemonsets
     - deployments
     - statefulsets
+    - replicasets
     - verticalpodautoscalers
     - horizontalpodautoscalers
     - cronjobs
