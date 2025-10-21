@@ -27,9 +27,3 @@ spec:
     - repoURL: 'https://github.com/nomad-mrkn/charts.git'
       targetRevision: HEAD
       path: fluent-bit
-      helm:
-        values: |
-          # Добавьте специфичные для fluent-bit значения Helm здесь, если необходимо
-          # Например:
-          # service:
-          #   type: ClusterIP
