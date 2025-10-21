@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: k8s-spb2-backend1-certmanager
+  name: k8s-spb2-backend1-certmanager1
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "2"
@@ -21,9 +21,9 @@ spec:
       targetRevision: HEAD
       path: shared/jit-rbac
       kustomize:
-        nameSuffix: -k8s-spb2-backend1-certmanager
+        nameSuffix: -k8s-spb2-backend1-certmanager1
         commonLabels:
-          jit-rbac/app: k8s-spb2-backend1-certmanager
+          jit-rbac/app: k8s-spb2-backend1-certmanager1
     - repoURL: 'https://github.com/nomad-mrkn/charts.git'
       targetRevision: HEAD
       path: cert-manager
