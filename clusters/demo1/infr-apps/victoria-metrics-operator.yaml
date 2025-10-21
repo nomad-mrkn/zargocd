@@ -24,7 +24,6 @@ spec:
         nameSuffix: -k8s-spb2-backend1-victoria-metrics-operator
         commonLabels:
           jit-rbac/app: k8s-spb2-backend1-victoria-metrics-operator
-          jit-rbac/ttl: "60"
     - repoURL: 'https://github.com/nomad-mrkn/charts.git'
       targetRevision: HEAD
       path: victoria-metrics-operator
