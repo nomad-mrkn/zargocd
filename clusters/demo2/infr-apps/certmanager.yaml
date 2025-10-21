@@ -31,7 +31,6 @@ spec:
       helm:
         releaseName: k8s-spb2-backend2-certmanager
         values: |
-          installCRDs: true
-          
-# startupapicheck:
-#   enabled: false
+          installCRDs: true          
+          startupapicheck:
+            enabled: false
