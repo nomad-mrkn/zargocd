@@ -14,7 +14,6 @@ rules:
     - verticalpodautoscalers
     - horizontalpodautoscalers
     - cronjobs
-    - jobs
     - certificates
     - issuers
     - ingresses
@@ -60,6 +59,9 @@ rules:
   - apiGroups: [""]
     resources: ["events"]
     verbs: ["create", "list"]
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["create"]
   - apiGroups: ["rbac.authorization.k8s.io"]
     resources: ["clusterrolebindings"]
     verbs: ["create", "delete"]
@@ -69,8 +71,7 @@ rules:
     verbs: ["bind"]
   - apiGroups: ["rbac.authorization.k8s.io"]
     resources: ["clusterroles"]
-    resourceNames: ["argocd-manager-full"]
-    verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "escalate"]
-  - apiGroups: ["rbac.authorization.k8s.io"]
-    resources: ["clusterroles"]
     verbs: ["create","escalate"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["delete", "list", "get", "watch", "update"]
