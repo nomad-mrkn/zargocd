@@ -20,6 +20,8 @@ spec:
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
       path: shared/jit-rbac
+      kustomize:
+        nameSuffix: -k8s-spb2-backend1-custom-resource
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
       path: clusters/demo1/custom-resource
