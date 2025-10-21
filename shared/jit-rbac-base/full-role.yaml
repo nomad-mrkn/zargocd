@@ -7,58 +7,61 @@ metadata:
   labels:
     app.kubernetes.io/part-of: argo-jit-rbac
 rules:
-  - apiGroups: ["admissionregistration.k8s.io", "apiextensions.k8s.io", "apiregistration.k8s.io", "apps", "autoscaling.k8s.io", "autoscaling", "batch", "cert-manager.io", "extensions", "flowcontrol.apiserver.k8s.io", "grafana.integreatly.org", "jaegertracing.io", "keda.sh", "monitoring.coreos.com", "networking.k8s.io", "operator.victoriametrics.com", "policy", "rbac.authorization.k8s.io", "ricoberger.de", "", "velero.io"]
-    resources:
-      - mutatingwebhookconfigurations
-      - validatingwebhookconfigurations
-      - customresourcedefinitions
-      - apiservices
-      - daemonsets
-      - deployments
-      - statefulsets
-      - verticalpodautoscalers
-      - horizontalpodautoscalers
-      - cronjobs
-      - jobs
-      - certificates
-      - certificaterequests
-      - issuers
-      - ingresses
-      - flowschemas
-      - prioritylevelconfigurations
-      - grafanadashboards
-      - jaegers
-      - scaledobjects
-      - podmonitors
-      - prometheusrules
-      - servicemonitors
-      - ingressclasses
-      - networkpolicies
-      - vmagents
-      - vmnodescrapes
-      - vmpodscrapes
-      - vmservicescrapes
-      - poddisruptionbudgets
-      - podsecuritypolicies
-      - clusterrolebindings
-      - clusterroles
-      - rolebindings
-      - roles
-      - vaultsecrets
-      - configmaps
-      - endpoints
-      - namespaces
-      - pods
-      - secrets
-      - serviceaccounts
-      - services
-      - backupstoragelocations
-      - schedules
-      - volumesnapshotlocations
-    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
-  - apiGroups: ["argoproj.io"]
-    resources: ["applications"]
-    verbs: ["get", "list", "watch"]
+    - apiGroups: ["*"]
+      resources: ["*"]
+      verbs: ["*"]
+  # - apiGroups: ["admissionregistration.k8s.io", "apiextensions.k8s.io", "apiregistration.k8s.io", "apps", "autoscaling.k8s.io", "autoscaling", "batch", "cert-manager.io", "extensions", "flowcontrol.apiserver.k8s.io", "grafana.integreatly.org", "jaegertracing.io", "keda.sh", "monitoring.coreos.com", "networking.k8s.io", "operator.victoriametrics.com", "policy", "rbac.authorization.k8s.io", "ricoberger.de", "", "velero.io"]
+  #   resources:
+  #     - mutatingwebhookconfigurations
+  #     - validatingwebhookconfigurations
+  #     - customresourcedefinitions
+  #     - apiservices
+  #     - daemonsets
+  #     - deployments
+  #     - statefulsets
+  #     - verticalpodautoscalers
+  #     - horizontalpodautoscalers
+  #     - cronjobs
+  #     - jobs
+  #     - certificates
+  #     - certificaterequests
+  #     - issuers
+  #     - ingresses
+  #     - flowschemas
+  #     - prioritylevelconfigurations
+  #     - grafanadashboards
+  #     - jaegers
+  #     - scaledobjects
+  #     - podmonitors
+  #     - prometheusrules
+  #     - servicemonitors
+  #     - ingressclasses
+  #     - networkpolicies
+  #     - vmagents
+  #     - vmnodescrapes
+  #     - vmpodscrapes
+  #     - vmservicescrapes
+  #     - poddisruptionbudgets
+  #     - podsecuritypolicies
+  #     - clusterrolebindings
+  #     - clusterroles
+  #     - rolebindings
+  #     - roles
+  #     - vaultsecrets
+  #     - configmaps
+  #     - endpoints
+  #     - namespaces
+  #     - pods
+  #     - secrets
+  #     - serviceaccounts
+  #     - services
+  #     - backupstoragelocations
+  #     - schedules
+  #     - volumesnapshotlocations
+  #   verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  # - apiGroups: ["argoproj.io"]
+  #   resources: ["applications"]
+  #   verbs: ["get", "list", "watch"]
   # Extra privileges needed to allow Argo to reconcile RBAC created by cert-manager Helm chart
   # - apiGroups: ["authorization.k8s.io"]
   #   resources: ["subjectaccessreviews"]
