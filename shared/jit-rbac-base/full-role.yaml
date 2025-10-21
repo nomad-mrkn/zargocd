@@ -3,7 +3,7 @@ kind: ClusterRole
 metadata:
   name: argocd-manager-full
   annotations:
-    argocd.argoproj.io/sync-wave: "-9"
+    argocd.argoproj.io/sync-wave: "-2"
   labels:
     app.kubernetes.io/part-of: argo-jit-rbac
 rules:
