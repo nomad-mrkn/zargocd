@@ -15,6 +15,7 @@ spec:
       directories:
       - path: clusters/demo*
   syncPolicy:
+    prune: true
     preserveResourcesOnDeletion: true
   template:
     metadata:
