@@ -12,7 +12,7 @@ spec:
     syncOptions:
     - CreateNamespace=true
     - FailOnSharedResource=false
-    - Validate=false
+    # - Validate=false
   project: default
   destination:
     name: kind-spoke-1
@@ -32,5 +32,7 @@ spec:
         releaseName: k8s-spb2-backend1-certmanager
         values: |
           installCRDs: true          
-          startupapicheck:
-            enabled: false
+
+
+        # startupapicheck:
+        #   enabled: false

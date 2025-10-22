@@ -2,15 +2,15 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   labels:
-    app.kubernetes.io/instance: k8s-spb2-backend5-install-all
-  name: k8s-spb2-backend5-install-all
+    app.kubernetes.io/instance: k8s-spb2-backend6-install-all
+  name: k8s-spb2-backend6-install-all
   namespace: argocd
 spec:
   generators:
     - list:
         elements:
-        - cluster: k8s-spb2-backend5
-          url: https://spoke-5-control-plane:6445
+        - cluster: k8s-spb2-backend6
+          url: https://spoke-6-control-plane:6446
   syncPolicy:
     prune: true
     preserveResourcesOnDeletion: true
@@ -26,7 +26,7 @@ spec:
       source:
         directory:
           recurse: true
-        path: clusters/demo5/infr-apps
+        path: clusters/demo6/infr-apps
         repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
         targetRevision: HEAD
       syncPolicy:
