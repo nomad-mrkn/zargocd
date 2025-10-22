@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: k8s-spb2-backend4-certmanager
+  name: k8s-spb2-backend3-certmanager
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "2"
@@ -15,21 +15,21 @@ spec:
     - Validate=false
   project: default
   destination:
-    name: kind-spoke-4
+    name: kind-spoke-3
     namespace: cert-manager
   sources:
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
       path: shared/jit-rbac
       kustomize:
-        nameSuffix: -k8s-spb2-backend4-certmanager
+        nameSuffix: -k8s-spb2-backend3-certmanager
         commonLabels:
-          jit-rbac/app: k8s-spb2-backend4-certmanager
+          jit-rbac/app: k8s-spb2-backend3-certmanager
     - repoURL: 'https://github.com/nomad-mrkn/charts.git'
       targetRevision: HEAD
       path: cert-manager
       helm:
-        releaseName: k8s-spb2-backend4-certmanager
+        releaseName: k8s-spb2-backend3-certmanager
         values: |
           installCRDs: true
           
