@@ -7,6 +7,9 @@ metadata:
   labels:
     app.kubernetes.io/part-of: argo-jit-rbac
 rules:
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["create"]
   # - apiGroups: ["admissionregistration.k8s.io", "apiextensions.k8s.io", "apiregistration.k8s.io", "apps", "autoscaling.k8s.io", "autoscaling", "batch", "cert-manager.io", "extensions", "flowcontrol.apiserver.k8s.io", "grafana.integreatly.org", "jaegertracing.io", "keda.sh", "monitoring.coreos.com", "networking.k8s.io", "operator.victoriametrics.com", "policy", "rbac.authorization.k8s.io", "ricoberger.de", "", "velero.io"]
   #   resources:
   #     - mutatingwebhookconfigurations
