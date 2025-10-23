@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: k8s-spb2-backend2-rbac-base
+  name: k8s-spb2-backend2-rbac-roles
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "0"
