@@ -31,7 +31,7 @@ spec:
             patch: |-
               - op: replace
                 path: /roleRef/name
-                value: argocd-manager-full
+                value: argocd-manager-certmanager
     - repoURL: 'https://github.com/nomad-mrkn/charts.git'
       targetRevision: HEAD
       path: cert-manager
