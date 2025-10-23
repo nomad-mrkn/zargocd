@@ -74,7 +74,7 @@ rules:
     verbs: ["bind", "get", "update", "patch"]
   - apiGroups: ["rbac.authorization.k8s.io"]
     resources: ["clusterroles"]
-    verbs: ["create","escalate"]
+    verbs: ["create","escalate","update"]
   - apiGroups: ["batch"]
     resources: ["jobs"]
     verbs: ["delete", "list", "get", "watch", "update"]
