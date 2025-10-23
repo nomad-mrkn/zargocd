@@ -10,97 +10,97 @@ rules:
   - apiGroups: [""]
     resources: ["namespaces"]
     verbs: ["create"]
-  # - apiGroups: ["admissionregistration.k8s.io", "apiextensions.k8s.io", "apiregistration.k8s.io", "apps", "autoscaling.k8s.io", "autoscaling", "batch", "cert-manager.io", "extensions", "flowcontrol.apiserver.k8s.io", "grafana.integreatly.org", "jaegertracing.io", "keda.sh", "monitoring.coreos.com", "networking.k8s.io", "operator.victoriametrics.com", "policy", "rbac.authorization.k8s.io", "ricoberger.de", "", "velero.io"]
-  #   resources:
-  #     - mutatingwebhookconfigurations
-  #     - validatingwebhookconfigurations
-  #     - customresourcedefinitions
-  #     - apiservices
-  #     - daemonsets
-  #     - deployments
-  #     - statefulsets
-  #     - verticalpodautoscalers
-  #     - horizontalpodautoscalers
-  #     - cronjobs
-  #     - jobs
-  #     - certificates
-  #     - certificaterequests
-  #     - issuers
-  #     - ingresses
-  #     - flowschemas
-  #     - prioritylevelconfigurations
-  #     - grafanadashboards
-  #     - jaegers
-  #     - scaledobjects
-  #     - podmonitors
-  #     - prometheusrules
-  #     - servicemonitors
-  #     - ingressclasses
-  #     - networkpolicies
-  #     - vmagents
-  #     - vmnodescrapes
-  #     - vmpodscrapes
-  #     - vmservicescrapes
-  #     - poddisruptionbudgets
-  #     - podsecuritypolicies
-  #     - clusterrolebindings
-  #     - clusterroles
-  #     - rolebindings
-  #     - roles
-  #     - vaultsecrets
-  #     - configmaps
-  #     - endpoints
-  #     - namespaces
-  #     - pods
-  #     - secrets
-  #     - serviceaccounts
-  #     - services
-  #     - backupstoragelocations
-  #     - schedules
-  #     - volumesnapshotlocations
-  #   verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
-  # - apiGroups: ["argoproj.io"]
-  #   resources: ["applications"]
-  #   verbs: ["get", "list", "watch"]
-  # - apiGroups: ["authorization.k8s.io"]
-  #   resources: ["subjectaccessreviews"]
-  #   verbs: ["create"]
-  # - apiGroups: [""]
-  #   resources: ["events"]
-  #   verbs: ["create", "patch", "get", "update", "list", "watch"]
-  # - apiGroups: [""]
-  #   resources: ["serviceaccounts/token"]
-  #   verbs: ["create"]
-  # - apiGroups: ["certificates.k8s.io"]
-  #   resources: ["certificatesigningrequests", "certificatesigningrequests/status"]
-  #   verbs: ["get", "list", "watch", "update", "patch"]
-  # - apiGroups: ["certificates.k8s.io"]
-  #   resources: ["signers"]
-  #   verbs: ["sign"]
-  # - apiGroups: ["cert-manager.io"]
-  #   resources: ["signers"]
-  #   verbs: ["approve"]
-  # - apiGroups: ["cert-manager.io"]
-  #   resources: ["certificaterequests/status", "certificaterequests/finalizers", "certificates/status", "certificates/finalizers"]
-  #   verbs: ["update", "patch"]
-  # - apiGroups: ["cert-manager.io"]
-  #   resources: ["clusterissuers", "issuers"]
-  #   verbs: ["get", "list", "watch", "update", "patch"]
-  # - apiGroups: ["cert-manager.io"]
-  #   resources: ["clusterissuers/status", "issuers/status"]
-  #   verbs: ["update", "patch"]
-  # - apiGroups: ["acme.cert-manager.io"]
-  #   resources: ["orders", "orders/status", "orders/finalizers", "challenges", "challenges/status", "challenges/finalizers"]
-  #   verbs: ["create", "delete", "get", "list", "watch", "update", "patch"]
-  # - apiGroups: ["gateway.networking.k8s.io"]
-  #   resources: ["gateways", "gateways/finalizers", "httproutes", "httproutes/finalizers"]
-  #   verbs: ["get", "list", "watch", "update", "patch", "create", "delete"]
-  # - apiGroups: ["coordination.k8s.io"]
-  #   resources: ["leases"]
-  #   verbs: ["get", "update", "patch", "create", "list", "watch"]
-  # - apiGroups: ["networking.k8s.io"]
-  #   resources: ["ingresses/finalizers"]
-  #   verbs: ["update", "patch"]
+  - apiGroups: ["admissionregistration.k8s.io", "apiextensions.k8s.io", "apiregistration.k8s.io", "apps", "autoscaling.k8s.io", "autoscaling", "batch", "cert-manager.io", "extensions", "flowcontrol.apiserver.k8s.io", "grafana.integreatly.org", "jaegertracing.io", "keda.sh", "monitoring.coreos.com", "networking.k8s.io", "operator.victoriametrics.com", "policy", "rbac.authorization.k8s.io", "ricoberger.de", "", "velero.io"]
+    resources:
+      - mutatingwebhookconfigurations
+      - validatingwebhookconfigurations
+      - customresourcedefinitions
+      - apiservices
+      - daemonsets
+      - deployments
+      - statefulsets
+      - verticalpodautoscalers
+      - horizontalpodautoscalers
+      - cronjobs
+      - jobs
+      - certificates
+      - certificaterequests
+      - issuers
+      - ingresses
+      - flowschemas
+      - prioritylevelconfigurations
+      - grafanadashboards
+      - jaegers
+      - scaledobjects
+      - podmonitors
+      - prometheusrules
+      - servicemonitors
+      - ingressclasses
+      - networkpolicies
+      - vmagents
+      - vmnodescrapes
+      - vmpodscrapes
+      - vmservicescrapes
+      - poddisruptionbudgets
+      - podsecuritypolicies
+      - clusterrolebindings
+      - clusterroles
+      - rolebindings
+      - roles
+      - vaultsecrets
+      - configmaps
+      - endpoints
+      - namespaces
+      - pods
+      - secrets
+      - serviceaccounts
+      - services
+      - backupstoragelocations
+      - schedules
+      - volumesnapshotlocations
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  - apiGroups: ["argoproj.io"]
+    resources: ["applications"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["authorization.k8s.io"]
+    resources: ["subjectaccessreviews"]
+    verbs: ["create"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "patch", "get", "update", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["serviceaccounts/token"]
+    verbs: ["create"]
+  - apiGroups: ["certificates.k8s.io"]
+    resources: ["certificatesigningrequests", "certificatesigningrequests/status"]
+    verbs: ["get", "list", "watch", "update", "patch"]
+  - apiGroups: ["certificates.k8s.io"]
+    resources: ["signers"]
+    verbs: ["sign"]
+  - apiGroups: ["cert-manager.io"]
+    resources: ["signers"]
+    verbs: ["approve"]
+  - apiGroups: ["cert-manager.io"]
+    resources: ["certificaterequests/status", "certificaterequests/finalizers", "certificates/status", "certificates/finalizers"]
+    verbs: ["update", "patch"]
+  - apiGroups: ["cert-manager.io"]
+    resources: ["clusterissuers", "issuers"]
+    verbs: ["get", "list", "watch", "update", "patch"]
+  - apiGroups: ["cert-manager.io"]
+    resources: ["clusterissuers/status", "issuers/status"]
+    verbs: ["update", "patch"]
+  - apiGroups: ["acme.cert-manager.io"]
+    resources: ["orders", "orders/status", "orders/finalizers", "challenges", "challenges/status", "challenges/finalizers"]
+    verbs: ["create", "delete", "get", "list", "watch", "update", "patch"]
+  - apiGroups: ["gateway.networking.k8s.io"]
+    resources: ["gateways", "gateways/finalizers", "httproutes", "httproutes/finalizers"]
+    verbs: ["get", "list", "watch", "update", "patch", "create", "delete"]
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "update", "patch", "create", "list", "watch"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses/finalizers"]
+    verbs: ["update", "patch"]
   - apiGroups: ["route.openshift.io"]
     resources: ["routes/custom-host"]
     verbs: ["create"]
