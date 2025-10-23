@@ -67,7 +67,7 @@ rules:
     verbs: ["create", "delete"]
   - apiGroups: ["rbac.authorization.k8s.io"]
     resources: ["clusterroles"]
-    resourceNames: ["argocd-manager-full"]
+    resourceNames: ["*"]
     verbs: ["bind", "get", "update", "patch"]
   - apiGroups: ["rbac.authorization.k8s.io"]
     resources: ["clusterroles"]
