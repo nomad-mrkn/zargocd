@@ -24,16 +24,14 @@ spec:
         nameSuffix: -k8s-spb2-backend4-certmanager
         commonLabels:
           jit-rbac/app: k8s-spb2-backend4-certmanager
-      patchesJson6902:
-        - target:
-            group: rbac.authorization.k8s.io
-            version: v1
-            kind: ClusterRoleBinding
-            labelSelector: app.kubernetes.io/part-of=argo-jit-rbac
-          patch: |-
-            - op: replace
-              path: /roleRef/name
-              value: argocd-manager-certmanager
+        patches:
+          - target:
+              kind: ClusterRoleBinding
+              labelSelector: "app.kubernetes.io/part-of=argo-jit-rbac"
+            patch: |-
+              - op: replace
+                path: /roleRef/name
+                value: argocd-manager-certmanager
     - repoURL: 'https://github.com/nomad-mrkn/charts.git'
       targetRevision: HEAD
       path: cert-manager
