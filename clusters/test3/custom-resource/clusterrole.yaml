@@ -43,7 +43,6 @@ rules:
     - vaultsecrets
     - configmaps
     - endpoints
-    - namespaces
     - pods
     - secrets
     - serviceaccounts
@@ -64,7 +63,7 @@ rules:
     verbs: ["create", "list"]
   - apiGroups: [""]
     resources: ["namespaces"]
-    verbs: ["create"]
+    verbs: ["create", "get", "list", "watch"]
   - apiGroups: ["rbac.authorization.k8s.io"]
     resources: ["clusterrolebindings"]
     verbs: ["create", "delete"]
