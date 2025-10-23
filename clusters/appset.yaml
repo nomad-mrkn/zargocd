@@ -13,7 +13,7 @@ spec:
       repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       revision: HEAD
       directories:
-      - path: clusters/demo*
+      - path: clusters/test*
   syncPolicy:
     prune: true
     preserveResourcesOnDeletion: true
