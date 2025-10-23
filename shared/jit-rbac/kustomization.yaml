@@ -6,15 +6,18 @@ generatorOptions:
 configMapGenerator:
   - name: jit-rbac-params
     literals:
-      - roleName=argocd-manager-full
-vars:
-  - name: ROLE_NAME
-    objref:
-      apiVersion: v1
+      - roleName=argocd-manager
+replacements:
+  - source:
       kind: ConfigMap
       name: jit-rbac-params
-    fieldref:
-      fieldpath: data.roleName
+      fieldPath: data.roleName
+    targets:
+      - select:
+          kind: ClusterRoleBinding
+          labelSelector: app.kubernetes.io/part-of=argo-jit-rbac
+        fieldPaths:
+          - roleRef/name
 resources:
   - pre-hook.yaml
   - post-hook.yaml
