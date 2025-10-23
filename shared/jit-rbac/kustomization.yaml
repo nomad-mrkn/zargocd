@@ -1,6 +1,20 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+namespace: kube-system
+generatorOptions:
+  disableNameSuffixHash: true
+configMapGenerator:
+  - name: jit-rbac-params
+    literals:
+      - roleName=argocd-manager-full
+vars:
+  - name: ROLE_NAME
+    objref:
+      apiVersion: v1
+      kind: ConfigMap
+      name: jit-rbac-params
+    fieldref:
+      fieldpath: data.roleName
 resources:
   - pre-hook.yaml
   - post-hook.yaml
-

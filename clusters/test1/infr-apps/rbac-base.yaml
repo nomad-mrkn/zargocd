@@ -13,7 +13,9 @@ spec:
   source:
     repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
     targetRevision: HEAD
-    path: shared/jit-rbac-base
+    path: shared/jit-rbac-roles
+    directory:
+      recurse: true
   syncPolicy:
     automated:
       prune: false
