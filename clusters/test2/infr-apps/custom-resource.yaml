@@ -14,7 +14,7 @@ spec:
     - Validate=false
   project: default
   destination:
-    name: test-spoke-2
+    name: kind-test-2
     namespace: kube-system
   sources:
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'

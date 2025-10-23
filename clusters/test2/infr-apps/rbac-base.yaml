@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   destination:
-    name: test-spoke-2
+    name: kind-test-2
     namespace: kube-system
   source:
     repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
