@@ -21,6 +21,7 @@ spec:
       targetRevision: HEAD
       path: shared/jit-rbac
       kustomize:
+        nameSuffix: -k8s-spb2-backend1-certmanager
         commonLabels:
           jit-rbac/app: k8s-spb2-backend1-certmanager
     - repoURL: 'https://github.com/nomad-mrkn/charts.git'
@@ -29,4 +30,4 @@ spec:
       helm:
         releaseName: k8s-spb2-backend1-certmanager
         values: |
-          installCRDs: true          
+          installCRDs: true
