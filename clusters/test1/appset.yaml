@@ -12,6 +12,7 @@ spec:
         - cluster: k8s-spb2-backend1
           url: https://spoke-1-control-plane:6443
   syncPolicy:
+    prune: false
     preserveResourcesOnDeletion: true
   template:
     metadata:
@@ -30,5 +31,5 @@ spec:
         targetRevision: HEAD
       syncPolicy:
         automated:
-          prune: false
+          prune: true
           selfHeal: false
