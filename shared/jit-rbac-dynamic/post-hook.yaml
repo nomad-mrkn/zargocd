@@ -1,0 +1,82 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: argocd-jit-rbac-cleanup
+  namespace: kube-system
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded,HookFailed
+    argocd.argoproj.io/sync-wave: "99"
+  labels:
+    app.kubernetes.io/part-of: argo-jit-rbac
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 60
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/part-of: argo-jit-rbac
+    spec:
+      serviceAccountName: argocd-manager
+      restartPolicy: Never
+      containers:
+      - name: cleanup
+        image: bitnami/kubectl:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: JIT_RBAC_APP
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['jit-rbac/app']
+        - name: REQUIRED_ROLE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['jit-rbac/required-role']
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            set -euo pipefail
+            
+            echo "Starting JIT RBAC cleanup for app: ${JIT_RBAC_APP}, role: ${REQUIRED_ROLE}"
+            
+            # Delete temporary ClusterRoleBindings for this specific app
+            echo "Deleting temporary CRBs with labels:"
+            echo "  app.kubernetes.io/part-of=argo-jit-rbac"
+            echo "  jit-rbac/app=${JIT_RBAC_APP}"
+            echo "  jit-rbac/required-role=${REQUIRED_ROLE}"
+            
+            kubectl delete clusterrolebinding \
+              -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP},jit-rbac/required-role=${REQUIRED_ROLE} \
+              --ignore-not-found=true || true
+            
+            # Clean up completed PostSync pods for this app
+            echo "Deleting completed PostSync pods with labels:"
+            echo "  app.kubernetes.io/part-of=argo-jit-rbac"
+            echo "  jit-rbac/app=${JIT_RBAC_APP}"
+            
+            kubectl delete pod -n kube-system \
+              -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} \
+              --field-selector=status.phase=Succeeded \
+              --ignore-not-found=true || true
+            
+            # Clean up failed pods older than 5 minutes
+            echo "Cleaning up old failed JIT RBAC pods..."
+            kubectl get pods -n kube-system \
+              -l app.kubernetes.io/part-of=argo-jit-rbac \
+              --field-selector=status.phase=Failed \
+              -o jsonpath='{range .items[*]}{.metadata.name}{" "}{.metadata.creationTimestamp}{"\n"}{end}' | \
+            while read pod_name creation_time; do
+              if [ -n "$pod_name" ] && [ -n "$creation_time" ]; then
+                # Check if pod is older than 5 minutes
+                creation_epoch=$(date -d "$creation_time" +%s 2>/dev/null || echo "0")
+                current_epoch=$(date +%s)
+                age_seconds=$((current_epoch - creation_epoch))
+                
+                if [ $age_seconds -gt 300 ]; then  # 5 minutes = 300 seconds
+                  echo "Deleting old failed pod: $pod_name (age: ${age_seconds}s)"
+                  kubectl delete pod -n kube-system "$pod_name" --ignore-not-found=true || true
+                fi
+              fi
+            done
+            
+            echo "JIT RBAC cleanup completed successfully"

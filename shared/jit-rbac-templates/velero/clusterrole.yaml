@@ -1,0 +1,157 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argocd-manager-velero
+  annotations:
+    argocd.argoproj.io/sync-wave: "-3"
+  labels:
+    app.kubernetes.io/part-of: argo-jit-rbac-templates
+    jit-rbac/template: velero
+rules:
+  # Core Kubernetes resources for backup
+  - apiGroups: [""]
+    resources:
+      - configmaps
+      - endpoints
+      - events
+      - namespaces
+      - persistentvolumes
+      - persistentvolumeclaims
+      - pods
+      - secrets
+      - serviceaccounts
+      - services
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  # Velero CRDs
+  - apiGroups: ["velero.io"]
+    resources:
+      - backups
+      - backupstoragelocations
+      - deletebackuprequests
+      - downloadrequests
+      - podvolumebackups
+      - podvolumerestores
+      - resticrepositories
+      - restores
+      - schedules
+      - serverstatusrequests
+      - volumesnapshotlocations
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  - apiGroups: ["velero.io"]
+    resources:
+      - backups/status
+      - backups/finalizers
+      - deletebackuprequests/status
+      - podvolumebackups/status
+      - podvolumerestores/status
+      - resticrepositories/status
+      - restores/status
+      - restores/finalizers
+      - schedules/status
+      - volumesnapshotlocations/status
+    verbs: ["update", "patch"]
+  
+  # Volume snapshot resources
+  - apiGroups: ["snapshot.storage.k8s.io"]
+    resources:
+      - volumesnapshots
+      - volumesnapshotclasses
+      - volumesnapshotcontents
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  - apiGroups: ["snapshot.storage.k8s.io"]
+    resources:
+      - volumesnapshots/status
+      - volumesnapshotcontents/status
+    verbs: ["update", "patch"]
+  
+  # Storage classes and CSI
+  - apiGroups: ["storage.k8s.io"]
+    resources:
+      - storageclasses
+      - csinodes
+      - csidrivers
+      - csistoragecapacities
+    verbs: ["get", "list", "watch"]
+  
+  # Deployments and DaemonSets for Velero
+  - apiGroups: ["apps"]
+    resources:
+      - deployments
+      - daemonsets
+      - statefulsets
+      - replicasets
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  # RBAC for Velero components
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources:
+      - clusterroles
+      - clusterrolebindings
+      - roles
+      - rolebindings
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  # Custom Resource Definitions
+  - apiGroups: ["apiextensions.k8s.io"]
+    resources:
+      - customresourcedefinitions
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  # Admission controllers
+  - apiGroups: ["admissionregistration.k8s.io"]
+    resources:
+      - mutatingwebhookconfigurations
+      - validatingwebhookconfigurations
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  # Pod security policies (if used)
+  - apiGroups: ["policy"]
+    resources:
+      - podsecuritypolicies
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete", "use"]
+  
+  # Pod disruption budgets
+  - apiGroups: ["policy"]
+    resources:
+      - poddisruptionbudgets
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  # Service account token creation
+  - apiGroups: [""]
+    resources:
+      - serviceaccounts/token
+    verbs: ["create"]
+  
+  # Events and logging
+  - apiGroups: [""]
+    resources:
+      - events
+    verbs: ["create", "patch", "get", "update", "list", "watch"]
+  
+  # Authorization checks
+  - apiGroups: ["authorization.k8s.io"]
+    resources:
+      - subjectaccessreviews
+    verbs: ["create"]
+  
+  # Coordination for leader election
+  - apiGroups: ["coordination.k8s.io"]
+    resources:
+      - leases
+    verbs: ["create", "update", "patch", "get", "list", "watch"]
+  
+  # Node information for backup operations
+  - apiGroups: [""]
+    resources:
+      - nodes
+    verbs: ["get", "list", "watch"]
+  
+  # Jobs for backup/restore operations
+  - apiGroups: ["batch"]
+    resources:
+      - jobs
+      - cronjobs
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]

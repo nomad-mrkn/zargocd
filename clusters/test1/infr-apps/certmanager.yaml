@@ -5,6 +5,7 @@ metadata:
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "2"
+    jit-rbac/required-role: "argocd-manager-cert-manager"
 spec:
   syncPolicy:
     automated:
@@ -17,23 +18,42 @@ spec:
     name: kind-test-1
     namespace: cert-manager
   sources:
+    # JIT RBAC Template for cert-manager
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
-      path: shared/jit-rbac
+      path: shared/jit-rbac-templates/cert-manager
+    # Dynamic JIT RBAC Hooks
+    - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+      targetRevision: HEAD
+      path: shared/jit-rbac-dynamic
       kustomize:
         nameSuffix: -k8s-spb2-backend1-certmanager
         commonLabels:
           jit-rbac/app: k8s-spb2-backend1-certmanager
-      patchesJson6902:
-        - target:
-            group: rbac.authorization.k8s.io
-            version: v1
-            kind: ClusterRoleBinding
-            labelSelector: app.kubernetes.io/part-of=argo-jit-rbac
-          patch: |-
-            - op: replace
-              path: /roleRef/name
-              value: argocd-manager-certmanager
+          jit-rbac/required-role: argocd-manager-cert-manager
+        patchesJson6902:
+          - target:
+              group: rbac.authorization.k8s.io
+              version: v1
+              kind: ClusterRoleBinding
+              name: argo-jit-rbac-binding
+            patch: |-
+              - op: replace
+                path: /roleRef/name
+                value: argocd-manager-cert-manager
+              - op: replace
+                path: /metadata/name
+                value: argo-jit-rbac-binding-k8s-spb2-backend1-certmanager
+          - target:
+              group: batch
+              version: v1
+              kind: Job
+              name: argocd-jit-rbac-cleanup
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: argocd-jit-rbac-cleanup-k8s-spb2-backend1-certmanager
+    # Cert-manager Helm Chart
     - repoURL: 'https://github.com/nomad-mrkn/charts.git'
       targetRevision: HEAD
       path: cert-manager

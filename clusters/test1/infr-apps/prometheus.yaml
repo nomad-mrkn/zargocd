@@ -1,0 +1,88 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: k8s-spb2-backend1-prometheus
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    jit-rbac/required-role: "argocd-manager-prometheus"
+spec:
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+    - CreateNamespace=true
+    - FailOnSharedResource=false
+  project: default
+  destination:
+    name: kind-test-1
+    namespace: monitoring
+  sources:
+    # JIT RBAC Template for prometheus
+    - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+      targetRevision: HEAD
+      path: shared/jit-rbac-templates/prometheus
+    # Dynamic JIT RBAC Hooks
+    - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+      targetRevision: HEAD
+      path: shared/jit-rbac-dynamic
+      kustomize:
+        nameSuffix: -k8s-spb2-backend1-prometheus
+        commonLabels:
+          jit-rbac/app: k8s-spb2-backend1-prometheus
+          jit-rbac/required-role: argocd-manager-prometheus
+        patchesJson6902:
+          - target:
+              group: rbac.authorization.k8s.io
+              version: v1
+              kind: ClusterRoleBinding
+              name: argo-jit-rbac-binding
+            patch: |-
+              - op: replace
+                path: /roleRef/name
+                value: argocd-manager-prometheus
+              - op: replace
+                path: /metadata/name
+                value: argo-jit-rbac-binding-k8s-spb2-backend1-prometheus
+          - target:
+              group: batch
+              version: v1
+              kind: Job
+              name: argocd-jit-rbac-cleanup
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: argocd-jit-rbac-cleanup-k8s-spb2-backend1-prometheus
+    # Prometheus Helm Chart
+    - repoURL: 'https://prometheus-community.github.io/helm-charts'
+      targetRevision: '*'
+      chart: kube-prometheus-stack
+      helm:
+        releaseName: k8s-spb2-backend1-prometheus
+        values: |
+          prometheus:
+            prometheusSpec:
+              storageSpec:
+                volumeClaimTemplate:
+                  spec:
+                    storageClassName: default
+                    accessModes: ["ReadWriteOnce"]
+                    resources:
+                      requests:
+                        storage: 10Gi
+          grafana:
+            adminPassword: "admin123"
+            persistence:
+              enabled: true
+              storageClassName: default
+              size: 5Gi
+          alertmanager:
+            alertmanagerSpec:
+              storage:
+                volumeClaimTemplate:
+                  spec:
+                    storageClassName: default
+                    accessModes: ["ReadWriteOnce"]
+                    resources:
+                      requests:
+                        storage: 5Gi
