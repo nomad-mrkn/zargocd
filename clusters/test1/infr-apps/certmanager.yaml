@@ -27,7 +27,7 @@ spec:
         patches:
           - target:
               kind: ClusterRoleBinding
-              name: argo-jit-rbac-binding
+              labelSelector: "app.kubernetes.io/part-of=argo-jit-rbac"
             patch: |-
               - op: replace
                 path: /roleRef/name

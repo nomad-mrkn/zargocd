@@ -24,6 +24,14 @@ spec:
         nameSuffix: -k8s-spb2-backend1-custom-resource
         commonLabels:
           jit-rbac/app: k8s-spb2-backend1-custom-resource
+        patches:
+          - target:
+              kind: ClusterRoleBinding
+              labelSelector: "app.kubernetes.io/part-of=argo-jit-rbac"
+            patch: |-
+              - op: replace
+                path: /roleRef/name
+                value: argocd-manager-full          
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
       path: clusters/test1/custom-resource
