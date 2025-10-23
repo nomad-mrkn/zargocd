@@ -11,7 +11,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: iam-a-placeholder-role
+  name: argocd-manager-full
 subjects:
   - kind: ServiceAccount
     name: argocd-manager
