@@ -1,29 +1,29 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: k8s-spb2-backend1-certmanager
+  name: k8s-spb2-backend1-custom-resource
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   syncPolicy:
     automated:
-      prune: true
+      prune: false
     syncOptions:
-    - CreateNamespace=true
     - FailOnSharedResource=false
+    # - Validate=false
   project: default
   destination:
     name: kind-test-1
-    namespace: cert-manager
+    namespace: kube-system
   sources:
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
       path: shared/jit-rbac
       kustomize:
-        nameSuffix: -k8s-spb2-backend1-certmanager
+        nameSuffix: -k8s-spb2-backend1-custom-resource
         commonLabels:
-          jit-rbac/app: k8s-spb2-backend1-certmanager
+          jit-rbac/app: k8s-spb2-backend1-custom-resource
         patches:
           - target:
               kind: ClusterRoleBinding
@@ -31,11 +31,7 @@ spec:
             patch: |-
               - op: replace
                 path: /roleRef/name
-                value: argocd-manager-certmanager
-    - repoURL: 'https://github.com/nomad-mrkn/charts.git'
+                value: argocd-manager-full          
+    - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
-      path: cert-manager
-      helm:
-        releaseName: k8s-spb2-backend1-certmanager
-        values: |
-          installCRDs: true
+      path: clusters/test1/custom-resource
