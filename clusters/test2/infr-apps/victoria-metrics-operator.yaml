@@ -68,4 +68,11 @@ spec:
             enabled: true
             args:
               - --kubelet-insecure-tls
+          
+          # Минимальная конфигурация VMAgent (чтобы избежать ошибки)
+          vmagent:
+            enabled: true
+            remoteWrite:
+              - url: http://localhost:8428/api/v1/write  # stub URL
+            shardCount: 1  # минимум для тестового окружения
 
