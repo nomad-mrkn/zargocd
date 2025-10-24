@@ -1,0 +1,77 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argocd-manager-fluent-bit
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+  labels:
+    app.kubernetes.io/part-of: argo-jit-rbac
+rules:
+  # Fluent-bit DaemonSet deployment
+  - apiGroups: ["apps"]
+    resources:
+      - daemonsets
+      - deployments
+      - replicasets
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  # Core resources
+  - apiGroups: [""]
+    resources:
+      - serviceaccounts
+      - services
+      - configmaps
+      - secrets
+      - pods
+      - pods/log
+      - events
+      - endpoints
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["create", "get", "list", "watch"]
+  
+  - apiGroups: [""]
+    resources: ["nodes", "nodes/proxy"]
+    verbs: ["get", "list", "watch"]
+  
+  # RBAC for fluent-bit service account
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources:
+      - clusterroles
+      - clusterrolebindings
+      - roles
+      - rolebindings
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  # Monitoring integration
+  - apiGroups: ["monitoring.coreos.com"]
+    resources:
+      - servicemonitors
+      - prometheusrules
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  # Network policies
+  - apiGroups: ["networking.k8s.io"]
+    resources:
+      - networkpolicies
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  # PodSecurityPolicy
+  - apiGroups: ["policy"]
+    resources:
+      - podsecuritypolicies
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  # Autoscaling
+  - apiGroups: ["autoscaling.k8s.io"]
+    resources:
+      - verticalpodautoscalers
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  # Jobs for hooks
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["create", "delete", "list", "get", "watch", "update"]
+
