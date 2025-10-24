@@ -76,7 +76,7 @@ rules:
   # JIT RBAC - Чтение ролей для валидации
   - apiGroups: ["rbac.authorization.k8s.io"]
     resources: ["clusterroles"]
-    verbs: ["get", "list", "watch"]
+    verbs: ["get", "list", "watch", "bind", "update", "patch"]
 
   # JIT RBAC - Cleanup jobs (только для JIT RBAC)
   - apiGroups: ["batch"]
