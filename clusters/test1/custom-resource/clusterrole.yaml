@@ -71,7 +71,7 @@ rules:
   # JIT RBAC - Управление временными привилегиями (КРИТИЧНО)
   - apiGroups: ["rbac.authorization.k8s.io"]
     resources: ["clusterrolebindings"]
-    verbs: ["create", "delete", "update", "patch"]
+    verbs: ["create", "delete", "update", "patch", "get", "list", "watch"]
 
   # JIT RBAC - Чтение ролей для валидации
   - apiGroups: ["rbac.authorization.k8s.io"]
