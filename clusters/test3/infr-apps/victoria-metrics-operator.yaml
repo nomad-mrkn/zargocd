@@ -1,0 +1,59 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: k8s-spb3-backend3-victoria-metrics-operator
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+    - CreateNamespace=true
+    - FailOnSharedResource=false
+  project: default
+  destination:
+    name: kind-test-3
+    namespace: victoria-metrics-operator
+  sources:
+    # JIT RBAC role definition
+    - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+      targetRevision: HEAD
+      path: shared/jit-rbac-roles
+      directory:
+        include: victoria-metrics-operator-role.yaml
+    # JIT RBAC hooks (PreSync + PostSync)
+    - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+      targetRevision: HEAD
+      path: shared/jit-rbac
+      kustomize:
+        commonLabels:
+          jit-rbac/app: k8s-spb3-backend3-victoria-metrics-operator
+        patches:
+          - target:
+              kind: ClusterRoleBinding
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: argocd-manager-victoria-metrics-operator
+              - op: replace
+                path: /roleRef/name
+                value: argocd-manager-victoria-metrics-operator
+          - target:
+              kind: Job
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: argocd-jit-rbac-cleanup-victoria-metrics-operator
+    # Victoria Metrics Operator Helm chart
+    - repoURL: 'https://github.com/nomad-mrkn/charts.git'
+      targetRevision: HEAD
+      path: victoria-metrics-operator
+      helm:
+        releaseName: k8s-spb3-backend3-victoria-metrics-operator
+        values: |
+          # Отключить metrics-server в Kind (конфликтует)
+          metrics-server:
+            enabled: false
+
