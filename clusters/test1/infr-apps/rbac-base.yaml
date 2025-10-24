@@ -4,7 +4,8 @@ metadata:
   name: k8s-spb2-backend1-rbac-base
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "0"
+    argocd.argoproj.io/sync-wave: "-2"
+    description: "Deploy app-specific ClusterRoles for JIT-RBAC"
 spec:
   project: default
   destination:
