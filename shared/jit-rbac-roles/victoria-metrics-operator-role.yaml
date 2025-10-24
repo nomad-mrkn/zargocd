@@ -49,11 +49,16 @@ rules:
       - vmusers/status
     verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
   
-  # Webhooks for operator
+  # Webhooks and API services
   - apiGroups: ["admissionregistration.k8s.io"]
     resources:
       - mutatingwebhookconfigurations
       - validatingwebhookconfigurations
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  - apiGroups: ["apiregistration.k8s.io"]
+    resources:
+      - apiservices
     verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
   
   # Cert-manager integration (if used)
@@ -83,6 +88,10 @@ rules:
       - endpoints
       - persistentvolumeclaims
     verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  - apiGroups: [""]
+    resources: ["configmaps/status"]
+    verbs: ["get", "update", "patch"]
   
   - apiGroups: [""]
     resources: ["namespaces"]
