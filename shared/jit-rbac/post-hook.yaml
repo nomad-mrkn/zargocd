@@ -31,7 +31,7 @@ spec:
         command: ["/bin/sh","-lc"]
         args:
           - |
-            echo "Deleting temporary CRBs with label app.kubernetes.io/part-of=argo-jit-rbac";
+            echo "Deleting temporary CRB by label selector";
             kubectl delete clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --ignore-not-found=true;
             echo "Deleting completed PostSync pods with label app.kubernetes.io/part-of=argo-jit-rbac";
             kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true;

@@ -17,13 +17,36 @@ spec:
     name: kind-test-1
     namespace: cert-manager
   sources:
+    # JIT RBAC role definition
+    - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+      targetRevision: HEAD
+      path: shared/jit-rbac-roles
+      directory:
+        include: argocd-manager-certmanager.yaml
+    # JIT RBAC hooks (PreSync + PostSync)
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
       path: shared/jit-rbac
       kustomize:
-        nameSuffix: -k8s-spb2-backend1-certmanager
         commonLabels:
           jit-rbac/app: k8s-spb2-backend1-certmanager
+        patches:
+          - target:
+              kind: ClusterRoleBinding
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: argocd-manager-certmanager
+              - op: replace
+                path: /roleRef/name
+                value: argocd-manager-certmanager
+          - target:
+              kind: Job
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: argocd-jit-rbac-cleanup-certmanager
+    # Cert-manager Helm chart
     - repoURL: 'https://github.com/nomad-mrkn/charts.git'
       targetRevision: HEAD
       path: cert-manager
