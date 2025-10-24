@@ -123,3 +123,8 @@ rules:
   - apiGroups: ["authorization.k8s.io"]
     resources: ["subjectaccessreviews"]
     verbs: ["create"]
+
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["clusterroles"]
+    resourceNames: ["argocd-manager-certmanager"]
+    verbs: ["bind", "get", "update", "patch"]
