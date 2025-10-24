@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: argocd-jit-rbac-cleanup-certmanager
+  namespace: kube-system
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded,HookFailed
+    argocd.argoproj.io/sync-wave: "99"
+  labels:
+    app.kubernetes.io/part-of: argo-jit-rbac
+    jit-rbac/app: certmanager
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 60
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/part-of: argo-jit-rbac
+        jit-rbac/app: certmanager
+    spec:
+      serviceAccountName: argocd-manager
+      restartPolicy: Never
+      containers:
+      - name: cleanup
+        image: bitnami/kubectl:latest
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/sh","-lc"]
+        args:
+          - |
+            echo "Deleting CRB: argo-jit-rbac-binding-certmanager";
+            kubectl delete clusterrolebinding argo-jit-rbac-binding-certmanager --ignore-not-found=true;
+            echo "Deleting completed pods";
+            kubectl delete pod -n kube-system -l jit-rbac/app=certmanager --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
+            echo "Done";
