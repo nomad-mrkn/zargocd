@@ -14,18 +14,20 @@
 ### Стало:
 - Отдельные роли для каждого типа приложений
 - Динамические hooks в `shared/jit-rbac-dynamic/`
-- Шаблоны ролей в `shared/jit-rbac-templates/`
+- Все роли в единой директории `shared/rbac-roles/`
+- Имена файлов ролей соответствуют именам приложений
 - Аннотации для указания требуемых прав
 
 ## Фазы миграции
 
 ### Фаза 1: Подготовка (1-2 дня)
 
-#### 1.1 Создание новых RBAC шаблонов ✅
-- [x] `shared/jit-rbac-templates/cert-manager/clusterrole.yaml`
-- [x] `shared/jit-rbac-templates/prometheus/clusterrole.yaml`
-- [x] `shared/jit-rbac-templates/ingress/clusterrole.yaml`
-- [x] `shared/jit-rbac-templates/velero/clusterrole.yaml`
+#### 1.1 Создание новых RBAC ролей ✅
+- [x] `shared/rbac-roles/certmanager.yaml`
+- [x] `shared/rbac-roles/prometheus.yaml`
+- [x] `shared/rbac-roles/ingress.yaml`
+- [x] `shared/rbac-roles/velero.yaml`
+- [x] `shared/rbac-roles/kustomization.yaml`
 
 #### 1.2 Создание динамических hooks ✅
 - [x] `shared/jit-rbac-dynamic/pre-hook.yaml`
@@ -35,7 +37,7 @@
 #### 1.3 Валидация новых ролей
 ```bash
 # Проверить синтаксис YAML
-kubectl apply --dry-run=client -f shared/jit-rbac-templates/*/clusterrole.yaml
+kubectl apply --dry-run=client -f shared/rbac-roles/
 
 # Проверить права на создание ролей
 kubectl auth can-i create clusterroles --as=system:serviceaccount:kube-system:argocd-manager
@@ -51,8 +53,8 @@ kind create cluster --name jit-rbac-test --config kind-config.yaml
 
 #### 2.2 Развертывание новой системы на тесте
 ```bash
-# Применить новые RBAC шаблоны
-kubectl apply -f shared/jit-rbac-templates/
+# Применить новые RBAC роли
+kubectl apply -f shared/rbac-roles/
 
 # Тестировать cert-manager с новой системой
 kubectl apply -f clusters/test1/infr-apps/certmanager.yaml

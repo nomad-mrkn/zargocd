@@ -18,10 +18,12 @@ spec:
     name: kind-test-1
     namespace: monitoring
   sources:
-    # JIT RBAC Template for prometheus
+    # JIT RBAC Role for prometheus
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
-      path: shared/jit-rbac-templates/prometheus
+      path: shared/rbac-roles
+      directory:
+        include: prometheus.yaml
     # Dynamic JIT RBAC Hooks
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
