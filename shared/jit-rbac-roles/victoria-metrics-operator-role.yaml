@@ -104,7 +104,7 @@ rules:
       - rolebindings
       - clusterroles
       - clusterrolebindings
-    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete", "bind", "escalate"]
   
   # Monitoring resources
   - apiGroups: ["monitoring.coreos.com"]
