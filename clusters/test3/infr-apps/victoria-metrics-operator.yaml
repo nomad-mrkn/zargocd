@@ -53,7 +53,19 @@ spec:
       helm:
         releaseName: k8s-spb3-backend3-victoria-metrics-operator
         values: |
-          # Отключить metrics-server в Kind (конфликтует)
+          # Использовать публичный образ вместо приватного registry
+          image:
+            repository: docker.io/victoriametrics/operator
+            tag: v0.41.1
+          
+          # Override для ConfigReload образа (использовать публичный)
+          env:
+            - name: VM_VMAGENTDEFAULT_CONFIGRELOADIMAGE
+              value: quay.io/prometheus-operator/prometheus-config-reloader:v0.68.0
+          
+          # Включить metrics-server с поддержкой Kind
           metrics-server:
-            enabled: false
+            enabled: true
+            args:
+              - --kubelet-insecure-tls
 
