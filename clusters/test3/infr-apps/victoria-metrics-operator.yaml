@@ -53,12 +53,6 @@ spec:
       helm:
         releaseName: k8s-spb3-backend3-victoria-metrics-operator
         values: |
-          operator:
-            create: true
-            image:
-              repository: docker.io/victoriametrics/operator
-              tag: v0.41.1
-          
           # Отключить metrics-server в Kind (конфликтует)
           metrics-server:
             enabled: false
