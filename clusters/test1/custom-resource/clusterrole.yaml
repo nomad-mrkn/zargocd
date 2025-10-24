@@ -64,7 +64,7 @@ rules:
     verbs: ["create"]
   - apiGroups: ["rbac.authorization.k8s.io"]
     resources: ["clusterrolebindings"]
-    verbs: ["create", "delete"]
+    verbs: ["create", "delete", "update"]
   - apiGroups: ["rbac.authorization.k8s.io"]
     resources: ["clusterroles"]
     verbs: ["bind", "get", "update", "patch", "create", "escalate"]
