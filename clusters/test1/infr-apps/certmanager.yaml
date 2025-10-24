@@ -20,11 +20,6 @@ spec:
   sources:
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
-      path: shared/jit-rbac-base
-      directory:
-        include: certmanager.yaml
-    - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
-      targetRevision: HEAD
       path: shared/jit-rbac
       kustomize:
         nameSuffix: -k8s-spb2-backend1-certmanager
