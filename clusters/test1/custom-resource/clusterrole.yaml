@@ -1,0 +1,125 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argocd-manager-watcher
+  annotations:
+    argocd.argoproj.io/sync-wave: "-6"
+    description: "Minimal ArgoCD watcher role for downtime period - JIT RBAC + monitoring only"
+rules:
+  # Мониторинг состояния кластера (READ-ONLY)
+  - apiGroups: [""]
+    resources:
+      - configmaps
+      - endpoints
+      - secrets
+      - serviceaccounts
+      - services
+      - persistentvolumes
+      - persistentvolumeclaims
+    verbs: ["get", "list", "watch"]
+  
+  # Управление pods (read + cleanup для JIT RBAC)
+  - apiGroups: [""]
+    resources:
+      - pods
+    verbs: ["get", "list", "watch", "delete"]
+  
+  # Управление namespaces (создание для приложений)
+  - apiGroups: [""]
+    resources:
+      - namespaces
+    verbs: ["get", "list", "watch", "create"]
+
+  # Мониторинг workload ресурсов (READ-ONLY)
+  - apiGroups: ["apps"]
+    resources:
+      - deployments
+      - daemonsets
+      - statefulsets
+      - replicasets
+    verbs: ["get", "list", "watch"]
+
+  # Мониторинг autoscaling (READ-ONLY)
+  - apiGroups: ["autoscaling", "autoscaling.k8s.io"]
+    resources:
+      - horizontalpodautoscalers
+      - verticalpodautoscalers
+    verbs: ["get", "list", "watch"]
+
+  # Мониторинг networking (READ-ONLY)
+  - apiGroups: ["networking.k8s.io"]
+    resources:
+      - ingresses
+      - ingressclasses
+      - networkpolicies
+    verbs: ["get", "list", "watch"]
+
+  # Мониторинг storage (READ-ONLY)
+  - apiGroups: ["storage.k8s.io"]
+    resources:
+      - storageclasses
+      - csistoragecapacities
+    verbs: ["get", "list", "watch"]
+
+  # Мониторинг policy (READ-ONLY)
+  - apiGroups: ["policy"]
+    resources:
+      - poddisruptionbudgets
+      - podsecuritypolicies
+    verbs: ["get", "list", "watch"]
+
+  # JIT RBAC - Управление временными привилегиями (КРИТИЧНО)
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["clusterrolebindings"]
+    verbs: ["create", "delete", "update", "patch", "get", "list", "watch"]
+
+  # JIT RBAC - Чтение ролей для валидации
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["clusterroles"]
+    verbs: ["get", "list", "watch", "bind", "update", "patch"]
+
+  # JIT RBAC - Cleanup jobs (только для JIT RBAC)
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["create", "delete", "get", "list", "watch"]
+
+  # Мониторинг CRDs (READ-ONLY)
+  - apiGroups: ["apiextensions.k8s.io"]
+    resources: ["customresourcedefinitions"]
+    verbs: ["get", "list", "watch"]
+
+  # Мониторинг admission controllers (READ-ONLY)
+  - apiGroups: ["admissionregistration.k8s.io"]
+    resources:
+      - mutatingwebhookconfigurations
+      - validatingwebhookconfigurations
+    verbs: ["get", "list", "watch"]
+
+  # Мониторинг API Services (READ-ONLY)
+  - apiGroups: ["apiregistration.k8s.io"]
+    resources: ["apiservices"]
+    verbs: ["get", "list", "watch"]
+
+  # Мониторинг application-specific CRDs (READ-ONLY)
+  - apiGroups: 
+      - "cert-manager.io"
+      - "acme.cert-manager.io"
+      - "monitoring.coreos.com"
+      - "grafana.integreatly.org"
+      - "operator.victoriametrics.com"
+      - "velero.io"
+      - "jaegertracing.io"
+      - "keda.sh"
+      - "ricoberger.de"
+    resources: ["*"]
+    verbs: ["get", "list", "watch"]
+
+  # Аудит и логирование
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "list"]
+
+  # Authorization checks (для проверки прав)
+  - apiGroups: ["authorization.k8s.io"]
+    resources: ["subjectaccessreviews"]
+    verbs: ["create"]

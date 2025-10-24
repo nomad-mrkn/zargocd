@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: k8s-spb2-backend1-rbac-watcher
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-6"
+    description: "Deploy minimal watcher ClusterRole for ArgoCD"
+spec:
+  project: default
+  destination:
+    name: kind-test-1
+    namespace: kube-system
+  source:
+    repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+    targetRevision: HEAD
+    path: clusters/test1/custom-resource
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false
+
