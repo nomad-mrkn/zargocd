@@ -126,3 +126,6 @@ rules:
     resources: ["leases"]
     verbs: ["create", "update", "patch", "get", "list", "watch"]
 
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["create", "delete", "list", "get", "watch", "update"]
