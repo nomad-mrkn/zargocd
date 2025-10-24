@@ -75,4 +75,3 @@ spec:
             remoteWrite:
               - url: http://localhost:8428/api/v1/write  # stub URL
             shardCount: 1  # минимум для тестового окружения
-
