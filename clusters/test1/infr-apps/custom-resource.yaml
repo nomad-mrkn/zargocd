@@ -21,4 +21,4 @@ spec:
     targetRevision: HEAD
     path: clusters/test1/custom-resource
     directory:
-      include: clusterrolebinding.yaml  # argocd-manager-watcher binding
+      include: clusterrolebinding.yaml
