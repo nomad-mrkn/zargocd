@@ -36,4 +36,6 @@ spec:
             kubectl delete clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --ignore-not-found=true;
             echo "Deleting completed PostSync pods with label app.kubernetes.io/part-of=argo-jit-rbac";
             kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
+            echo "Deleting temporary ClusterRole by label selector";
+            kubectl delete clusterrole -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --ignore-not-found=true;
             echo "Done";
