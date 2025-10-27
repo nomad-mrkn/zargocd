@@ -3,8 +3,6 @@ kind: ClusterRole
 metadata:
   name: certmanager-role
   annotations:
-    argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/hook-delete-policy: HookFailed
     argocd.argoproj.io/sync-wave: "-2"
   labels:
     app.kubernetes.io/part-of: argo-jit-rbac
