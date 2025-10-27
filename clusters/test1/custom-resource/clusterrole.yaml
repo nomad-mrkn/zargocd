@@ -72,5 +72,5 @@ rules:
     resources: ["pods"]
     verbs: ["delete"]
   - apiGroups: ["batch"]
-    resources: ["jobs"]
+    resources: ["jobs", "cronjobs"]
     verbs: ["create", "delete", "list", "get", "watch", "update"]
