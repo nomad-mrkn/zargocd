@@ -23,9 +23,6 @@ spec:
       path: shared/jit-rbac-roles
       directory:
         include: fluent-bit-role.yaml
-      kustomize:
-        commonLabels:
-          jit-rbac/app: k8s-spb2-backend2-fluent-bit
     # JIT RBAC hooks (PreSync + PostSync)
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
