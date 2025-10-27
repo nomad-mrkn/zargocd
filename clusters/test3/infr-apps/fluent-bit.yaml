@@ -1,10 +1,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: k8s-spb2-backend1-certmanager
+  name: k8s-spb3-backend3-fluent-bit
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-wave: "4"
 spec:
   syncPolicy:
     automated:
@@ -14,40 +14,44 @@ spec:
     - FailOnSharedResource=false
   project: default
   destination:
-    name: kind-test-1
-    namespace: cert-manager
+    name: kind-test-3
+    namespace: fluent-bit
   sources:
+    # JIT RBAC role definition
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
       path: shared/jit-rbac-roles
       directory:
-        include: certmanager-role.yaml
+        include: fluent-bit-role.yaml
+    # JIT RBAC hooks (PreSync + PostSync)
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
       path: shared/jit-rbac
       kustomize:
         commonLabels:
-          jit-rbac/app: k8s-spb2-backend1-certmanager
+          jit-rbac/app: k8s-spb3-backend3-fluent-bit
         patches:
           - target:
               kind: ClusterRoleBinding
             patch: |-
               - op: replace
                 path: /metadata/name
-                value: argocd-manager-certmanager
+                value: argocd-manager-fluent-bit
               - op: replace
                 path: /roleRef/name
-                value: argocd-manager-certmanager
+                value: argocd-manager-fluent-bit
           - target:
               kind: Job
             patch: |-
               - op: replace
                 path: /metadata/name
-                value: argocd-jit-rbac-cleanup-certmanager
+                value: argocd-jit-rbac-cleanup-fluent-bit
+    # Fluent-bit Helm chart
     - repoURL: 'https://github.com/nomad-mrkn/charts.git'
       targetRevision: HEAD
-      path: cert-manager
+      path: fluent-bit
       helm:
-        releaseName: k8s-spb2-backend1-certmanager
+        releaseName: k8s-spb3-backend3-fluent-bit
         values: |
-          installCRDs: true
+          kind: DaemonSet
+

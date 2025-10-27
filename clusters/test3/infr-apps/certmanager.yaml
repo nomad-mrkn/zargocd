@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: k8s-spb2-backend1-certmanager
+  name: k8s-spb3-backend3-certmanager
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "2"
@@ -14,7 +14,7 @@ spec:
     - FailOnSharedResource=false
   project: default
   destination:
-    name: kind-test-1
+    name: kind-test-3
     namespace: cert-manager
   sources:
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
@@ -27,7 +27,7 @@ spec:
       path: shared/jit-rbac
       kustomize:
         commonLabels:
-          jit-rbac/app: k8s-spb2-backend1-certmanager
+          jit-rbac/app: k8s-spb3-backend3-certmanager
         patches:
           - target:
               kind: ClusterRoleBinding
@@ -48,6 +48,6 @@ spec:
       targetRevision: HEAD
       path: cert-manager
       helm:
-        releaseName: k8s-spb2-backend1-certmanager
+        releaseName: k8s-spb3-backend3-certmanager
         values: |
           installCRDs: true
