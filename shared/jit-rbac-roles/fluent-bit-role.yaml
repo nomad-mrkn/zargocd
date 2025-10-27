@@ -1,8 +1,10 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: argocd-manager-fluent-bit
+  name: fluent-bit-role
   annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookFailed
     argocd.argoproj.io/sync-wave: "-2"
   labels:
     app.kubernetes.io/part-of: argo-jit-rbac

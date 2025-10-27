@@ -21,7 +21,10 @@ spec:
       targetRevision: HEAD
       path: shared/jit-rbac-roles
       directory:
-        include: argocd-manager-certmanager.yaml
+        include: certmanager-role.yaml
+      kustomize:
+        commonLabels:
+          jit-rbac/app: k8s-spb2-backend1-certmanager
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
       path: shared/jit-rbac
@@ -34,10 +37,10 @@ spec:
             patch: |-
               - op: replace
                 path: /metadata/name
-                value: argocd-manager-certmanager
+                value: certmanager-crb
               - op: replace
                 path: /roleRef/name
-                value: argocd-manager-certmanager
+                value: certmanager-role
           - target:
               kind: Job
             patch: |-

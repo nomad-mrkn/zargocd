@@ -23,6 +23,9 @@ spec:
       path: shared/jit-rbac-roles
       directory:
         include: victoria-metrics-operator-role.yaml
+      kustomize:
+        commonLabels:
+          jit-rbac/app: k8s-spb3-backend3-victoria-metrics-operator
     # JIT RBAC hooks (PreSync + PostSync)
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
@@ -36,10 +39,10 @@ spec:
             patch: |-
               - op: replace
                 path: /metadata/name
-                value: argocd-manager-victoria-metrics-operator
+                value: victoria-metrics-operator-crb
               - op: replace
                 path: /roleRef/name
-                value: argocd-manager-victoria-metrics-operator
+                value: victoria-metrics-operator-role
           - target:
               kind: Job
             patch: |-
