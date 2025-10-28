@@ -45,7 +45,7 @@ spec:
             patch: |-
               - op: replace
                 path: /metadata/name
-                value: argocd-jit-rbac-cleanup-fluent-bit
+                value: k8s-spb2-backend1-fluent-bit-cleanup-cron
     # JIT RBAC role definition - заполняет пустую роль правилами
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
