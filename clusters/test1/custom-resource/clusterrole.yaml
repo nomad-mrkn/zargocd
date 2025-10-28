@@ -61,7 +61,7 @@ rules:
     resources: ["clusterroles"]
     verbs: ["bind", "get", "update", "patch", "create", "escalate", "delete", "list", "watch"]
   - apiGroups: [""]
-    resources: ["pods"]
+    resources: ["pods", "configmaps"]
     verbs: ["delete", "get", "list", "watch"]
   - apiGroups: ["batch"]
     resources: ["jobs", "cronjobs"]
