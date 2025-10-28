@@ -42,14 +42,19 @@ spec:
                   echo "No temporary CRBs found";
                 fi
                 
-                echo "Checking for temporary ClusterRoles...";
+                echo "Checking for JIT ClusterRoles to clear rules...";
                 ROLES=$(kubectl get clusterrole -l app.kubernetes.io/part-of=argo-jit-rbac -o name 2>/dev/null | grep -v "argocd-manager-watcher" || echo "");
                 if [ -n "$ROLES" ]; then
-                  echo "Found ClusterRoles (keeping them for reuse):";
+                  echo "Found JIT ClusterRoles:";
                   echo "$ROLES";
-                  echo "ClusterRoles will be preserved for future deployments";
+                  for role in $ROLES; do
+                    role_name=$(echo "$role" | cut -d'/' -f2);
+                    echo "Ensuring empty rules for ClusterRole: $role_name";
+                    kubectl patch clusterrole "$role_name" --type=merge -p '{"rules": []}' || echo "Patch failed for $role_name";
+                  done
+                  echo "Ensured empty rules for all JIT ClusterRoles";
                 else
-                  echo "No ClusterRoles found";
+                  echo "No JIT ClusterRoles found";
                 fi
                 
                 echo "Checking for old cleanup pods...";
