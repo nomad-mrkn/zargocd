@@ -41,7 +41,7 @@ spec:
                 path: /roleRef/name
                 value: argocd-manager-fluent-bit
           - target:
-              kind: Job
+              kind: CronJob
             patch: |-
               - op: replace
                 path: /metadata/name
