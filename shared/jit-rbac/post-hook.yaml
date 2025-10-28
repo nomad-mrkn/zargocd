@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: argocd-jit-rbac-clear-role
+  name: argocd-jit-rbac-cleanup
   namespace: kube-system
   annotations:
     argocd.argoproj.io/hook: PostSync
@@ -21,7 +21,7 @@ spec:
       serviceAccountName: argocd-manager
       restartPolicy: Never
       containers:
-      - name: clear-role
+      - name: cleanup
         image: bitnami/kubectl:latest
         imagePullPolicy: IfNotPresent
         env:
@@ -29,25 +29,19 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.labels['jit-rbac/app']
-        - name: ROLE_NAME
-          value: "ROLE_NAME_PLACEHOLDER"
-        command: ["/bin/sh", "-c"]
+        command: ["/bin/sh","-lc"]
         args:
           - |
-            set -e
-            echo "=== JIT RBAC PostSync: Clearing Role ===";
-            echo "Application: ${JIT_RBAC_APP}";
-            echo "Role: ${ROLE_NAME}";
-            
-            # Удаляем ClusterRoleBinding
-            echo "Deleting ClusterRoleBinding";
-            kubectl delete clusterrolebinding "${ROLE_NAME}-binding" --ignore-not-found=true;
-            
-            # Очищаем роль (возвращаем к пустому состоянию)
-            echo "Clearing ClusterRole ${ROLE_NAME} (removing all permissions)";
-            kubectl patch clusterrole "${ROLE_NAME}" --type=merge -p '{"rules":[]}';
-            
-            # Очищаем метки приложения, но оставляем роль для переиспользования
-            kubectl label clusterrole "${ROLE_NAME}" jit-rbac/app- || true;
-            
-            echo "PostSync cleanup completed. Role ${ROLE_NAME} is now empty and ready for reuse";
+            echo "Getting ClusterRole name from CRB";
+            ROLE_NAME=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o jsonpath='{.items[0].roleRef.name}' 2>/dev/null || echo "");
+            echo "Deleting temporary CRB by label selector";
+            kubectl delete clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --ignore-not-found=true;
+            if [ -n "$ROLE_NAME" ]; then
+              echo "Deleting temporary ClusterRole: $ROLE_NAME";
+              kubectl delete clusterrole "$ROLE_NAME" --ignore-not-found=true;
+            else
+              echo "No ClusterRole found to delete";
+            fi
+            echo "Deleting completed PostSync pods with label app.kubernetes.io/part-of=argo-jit-rbac";
+            kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
+            echo "Done";
