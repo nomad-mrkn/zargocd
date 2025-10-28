@@ -42,23 +42,12 @@ spec:
             echo "Role: ${ROLE_NAME}";
             echo "ConfigMap: ${RULES_CONFIGMAP}";
             
-            # Проверяем, существует ли роль
+            # Проверяем, существует ли роль (она должна быть создана первым источником)
             if ! kubectl get clusterrole "${ROLE_NAME}" >/dev/null 2>&1; then
-              echo "Role ${ROLE_NAME} does not exist. Creating empty role...";
-              kubectl apply -f - <<EOF
-            apiVersion: rbac.authorization.k8s.io/v1
-            kind: ClusterRole
-            metadata:
-              name: ${ROLE_NAME}
-              labels:
-                app.kubernetes.io/part-of: jit-rbac
-                jit-rbac/type: dynamic-role
-                jit-rbac/service: ${ROLE_NAME#argocd-manager-}
-            rules: []
-            EOF
-              echo "Empty role ${ROLE_NAME} created";
+              echo "ERROR: Role ${ROLE_NAME} does not exist. It should be created by the first source.";
+              exit 1;
             else
-              echo "Role ${ROLE_NAME} already exists";
+              echo "Role ${ROLE_NAME} exists, proceeding with enrichment";
             fi
             
             # Читаем rules из ConfigMap
