@@ -1,4 +1,17 @@
 apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ROLE_NAME_PLACEHOLDER
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookFailed
+    argocd.argoproj.io/sync-wave: "-1"
+  labels:
+    app.kubernetes.io/part-of: argo-jit-rbac
+    jit-rbac/app: APP_NAME_PLACEHOLDER
+rules: []
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: ROLE_NAME_PLACEHOLDER
@@ -21,7 +34,7 @@ subjects:
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: ROLE_NAME_PLACEHOLDER-cleanup-cron
+  name: argocd-jit-rbac-cleanup-cron
   namespace: kube-system
   annotations:
     argocd.argoproj.io/hook: PreSync

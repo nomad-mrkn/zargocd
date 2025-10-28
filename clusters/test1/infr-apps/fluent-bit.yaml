@@ -26,6 +26,12 @@ spec:
           jit-rbac/app: k8s-spb2-backend1-fluent-bit
         patches:
           - target:
+              kind: ClusterRole
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: argocd-manager-fluent-bit
+          - target:
               kind: ClusterRoleBinding
             patch: |-
               - op: replace
@@ -34,12 +40,6 @@ spec:
               - op: replace
                 path: /roleRef/name
                 value: argocd-manager-fluent-bit
-          - target:
-              kind: CronJob
-            patch: |-
-              - op: replace
-                path: /metadata/name
-                value: argocd-manager-fluent-bit-cleanup-cron
           - target:
               kind: Job
             patch: |-
