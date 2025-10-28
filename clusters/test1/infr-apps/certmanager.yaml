@@ -37,7 +37,7 @@ spec:
             patch: |-
               - op: replace
                 path: /spec/template/spec/containers/0/env/1/value
-                value: certmanager-role
+                value: argocd-manager-certmanager
               - op: replace
                 path: /spec/template/spec/containers/0/env/2/value
                 value: jit-rbac-certmanager-rules
@@ -47,7 +47,7 @@ spec:
             patch: |-
               - op: replace
                 path: /spec/template/spec/containers/0/env/1/value
-                value: certmanager-role
+                value: argocd-manager-certmanager
     # Cert-manager Helm chart
     - repoURL: 'https://github.com/nomad-mrkn/charts.git'
       targetRevision: HEAD

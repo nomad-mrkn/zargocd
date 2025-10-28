@@ -53,7 +53,7 @@ spec:
               labels:
                 app.kubernetes.io/part-of: jit-rbac
                 jit-rbac/type: dynamic-role
-                jit-rbac/service: ${ROLE_NAME%-role}
+                jit-rbac/service: ${ROLE_NAME#argocd-manager-}
             rules: []
             EOF
               echo "Empty role ${ROLE_NAME} created";
