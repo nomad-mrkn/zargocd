@@ -1,10 +1,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: k8s-spb2-backend1-fluent-bit
+  name: k8s-spb2-backend2-certmanager
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   syncPolicy:
     automated:
@@ -14,8 +14,8 @@ spec:
     - FailOnSharedResource=false
   project: default
   destination:
-    name: kind-test-1
-    namespace: fluent-bit
+    name: kind-test-2
+    namespace: cert-manager
   sources:
     # JIT RBAC hooks (PreSync + PostSync) - создаёт временный биндинг
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
@@ -23,34 +23,33 @@ spec:
       path: shared/jit-rbac
       kustomize:
         commonLabels:
-          jit-rbac/app: k8s-spb2-backend1-fluent-bit
+          jit-rbac/app: k8s-spb2-backend2-certmanager
         patches:
           - target:
               kind: ClusterRoleBinding
             patch: |-
               - op: replace
                 path: /metadata/name
-                value: argocd-manager-fluent-bit
+                value: argocd-manager-certmanager
               - op: replace
                 path: /roleRef/name
-                value: argocd-manager-fluent-bit
+                value: argocd-manager-certmanager
           - target:
               kind: Job
             patch: |-
               - op: replace
                 path: /metadata/name
-                value: argocd-jit-rbac-cleanup-fluent-bit
+                value: argocd-jit-rbac-cleanup-certmanager
     # JIT RBAC role definition - заполняет пустую роль правилами
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
       path: shared/jit-rbac-roles
       directory:
-        include: fluent-bit-role.yaml
-    # Fluent-bit Helm chart
+        include: certmanager-role.yaml
     - repoURL: 'https://github.com/nomad-mrkn/charts.git'
       targetRevision: HEAD
-      path: fluent-bit
+      path: cert-manager
       helm:
-        releaseName: k8s-spb2-backend1-fluent-bit
+        releaseName: k8s-spb2-backend2-certmanager
         values: |
-          kind: DaemonSet
+          installCRDs: true

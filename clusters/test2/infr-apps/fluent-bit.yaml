@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: k8s-spb2-backend1-fluent-bit
+  name: k8s-spb2-backend2-fluent-bit
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "4"
@@ -14,7 +14,7 @@ spec:
     - FailOnSharedResource=false
   project: default
   destination:
-    name: kind-test-1
+    name: kind-test-2
     namespace: fluent-bit
   sources:
     # JIT RBAC hooks (PreSync + PostSync) - создаёт временный биндинг
@@ -23,7 +23,7 @@ spec:
       path: shared/jit-rbac
       kustomize:
         commonLabels:
-          jit-rbac/app: k8s-spb2-backend1-fluent-bit
+          jit-rbac/app: k8s-spb2-backend2-fluent-bit
         patches:
           - target:
               kind: ClusterRoleBinding
@@ -51,6 +51,6 @@ spec:
       targetRevision: HEAD
       path: fluent-bit
       helm:
-        releaseName: k8s-spb2-backend1-fluent-bit
+        releaseName: k8s-spb2-backend2-fluent-bit
         values: |
           kind: DaemonSet
