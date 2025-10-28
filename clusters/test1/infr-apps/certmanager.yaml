@@ -17,6 +17,12 @@ spec:
     name: kind-test-1
     namespace: cert-manager
   sources:
+    # Rules (ConfigMap + опционально пустая роль из того же файла)
+    - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+      targetRevision: HEAD
+      path: shared/jit-rbac-roles
+      directory:
+        include: certmanager-role.yaml
     # JIT RBAC hooks (PreSync + PostSync)
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
