@@ -8,12 +8,12 @@ rules:
     - mutatingwebhookconfigurations
     - validatingwebhookconfigurations
     - apiservices
+    - customresourcedefinitions
     - daemonsets
     - deployments
     - statefulsets
     - verticalpodautoscalers
     - horizontalpodautoscalers
-    - cronjobs
     - certificates
     - issuers
     - ingresses
@@ -33,16 +33,11 @@ rules:
     - vmservicescrapes
     - poddisruptionbudgets
     - podsecuritypolicies
-    - clusterrolebindings
-    - clusterroles
     - rolebindings
     - roles
     - vaultsecrets
     - configmaps
     - endpoints
-    - namespaces
-    - pods
-    - secrets
     - serviceaccounts
     - services
     - backupstoragelocations
@@ -53,24 +48,21 @@ rules:
     - storageclasses
     - csistoragecapacities
     verbs: ["get", "list", "watch"]
-  - apiGroups: ["apiextensions.k8s.io"]
-    resources: ["customresourcedefinitions"]
-    verbs: ["get", "list", "watch"]
   - apiGroups: [""]
     resources: ["events"]
     verbs: ["create", "list"]
   - apiGroups: [""]
     resources: ["namespaces"]
-    verbs: ["create"]
+    verbs: ["create", "get", "list", "watch"]
   - apiGroups: ["rbac.authorization.k8s.io"]
     resources: ["clusterrolebindings"]
-    verbs: ["create", "delete", "update", "patch"]
+    verbs: ["create", "delete", "update", "patch", "get", "list", "watch"]
   - apiGroups: ["rbac.authorization.k8s.io"]
     resources: ["clusterroles"]
-    verbs: ["bind", "get", "update", "patch", "create", "escalate", "delete"]
+    verbs: ["bind", "get", "update", "patch", "create", "escalate", "delete", "list", "watch"]
   - apiGroups: [""]
     resources: ["pods"]
     verbs: ["delete", "get", "list", "watch"]
   - apiGroups: ["batch"]
     resources: ["jobs", "cronjobs"]
-    verbs: ["create", "delete", "list", "get", "watch", "update", "patch"]
+    verbs: ["create", "delete", "list", "get", "watch", "update"]

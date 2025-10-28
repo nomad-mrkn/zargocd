@@ -6,14 +6,14 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "0"
 spec:
-  schedule: "*/5 * * * *"
+  schedule: "*/15 * * * *"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
       backoffLimit: 0
-      ttlSecondsAfterFinished: 300
+      ttlSecondsAfterFinished: 900
       template:
         metadata:
           labels:
@@ -31,7 +31,6 @@ spec:
                 echo "=== JIT RBAC Cleanup Cron Job ===";
                 echo "Starting cleanup at $(date)";
                 
-                # Удаляем все ClusterRoleBindings с label argo-jit-rbac (временные)
                 echo "Checking for temporary ClusterRoleBindings...";
                 CRBS=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac -o name 2>/dev/null || echo "");
                 if [ -n "$CRBS" ]; then
@@ -43,7 +42,6 @@ spec:
                   echo "No temporary CRBs found";
                 fi
                 
-                # Удаляем все ClusterRoles с label argo-jit-rbac, кроме argocd-manager-watcher
                 echo "Checking for temporary ClusterRoles...";
                 ROLES=$(kubectl get clusterrole -l app.kubernetes.io/part-of=argo-jit-rbac -o name 2>/dev/null | grep -v "argocd-manager-watcher" || echo "");
                 if [ -n "$ROLES" ]; then
@@ -61,10 +59,8 @@ spec:
                   echo "No temporary ClusterRoles found";
                 fi
                 
-                # Удаляем completed cleanup pods старше 5 минут
                 echo "Checking for old cleanup pods...";
                 kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
                 kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac-cron --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
                 
                 echo "Cleanup completed at $(date)";
-                echo "=================================";
