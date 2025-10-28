@@ -17,12 +17,13 @@ spec:
     name: kind-test-3
     namespace: fluent-bit
   sources:
-    # JIT RBAC role definition
+    # JIT RBAC: пустая роль + ConfigMap с правами
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
       path: shared/jit-rbac-roles
       directory:
         include: fluent-bit-role.yaml
+    
     # JIT RBAC hooks (PreSync + PostSync)
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
@@ -32,20 +33,23 @@ spec:
           jit-rbac/app: k8s-spb2-backend3-fluent-bit
         patches:
           - target:
-              kind: ClusterRoleBinding
+              kind: Job
+              name: argocd-jit-rbac-patch-role
             patch: |-
               - op: replace
-                path: /metadata/name
-                value: argocd-manager-fluent-bit
+                path: /spec/template/spec/containers/0/env/1/value
+                value: fluent-bit-role
               - op: replace
-                path: /roleRef/name
-                value: argocd-manager-fluent-bit
+                path: /spec/template/spec/containers/0/env/2/value
+                value: jit-rbac-fluent-bit-rules
           - target:
               kind: Job
+              name: argocd-jit-rbac-clear-role
             patch: |-
               - op: replace
-                path: /metadata/name
-                value: argocd-jit-rbac-cleanup-fluent-bit
+                path: /spec/template/spec/containers/0/env/1/value
+                value: fluent-bit-role
+    
     # Fluent-bit Helm chart
     - repoURL: 'https://github.com/nomad-mrkn/charts.git'
       targetRevision: HEAD
@@ -54,4 +58,3 @@ spec:
         releaseName: k8s-spb2-backend3-fluent-bit
         values: |
           kind: DaemonSet
-

@@ -1,0 +1,84 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: argocd-jit-rbac-patch-role
+  namespace: kube-system
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookFailed
+    argocd.argoproj.io/sync-wave: "-1"
+  labels:
+    app.kubernetes.io/part-of: argo-jit-rbac
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 60
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/part-of: argo-jit-rbac
+        jit-rbac/app: PLACEHOLDER
+    spec:
+      serviceAccountName: argocd-manager
+      restartPolicy: Never
+      containers:
+      - name: patch-role
+        image: bitnami/kubectl:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: JIT_RBAC_APP
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['jit-rbac/app']
+        - name: ROLE_NAME
+          value: "ROLE_NAME_PLACEHOLDER"
+        - name: RULES_CONFIGMAP
+          value: "RULES_CONFIGMAP_PLACEHOLDER"
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            set -e
+            echo "=== JIT RBAC PreSync: Patching Role ===";
+            echo "Application: ${JIT_RBAC_APP}";
+            echo "Role: ${ROLE_NAME}";
+            echo "ConfigMap: ${RULES_CONFIGMAP}";
+            
+            # Читаем rules из ConfigMap
+            echo "Fetching rules from ConfigMap ${RULES_CONFIGMAP}";
+            RULES_JSON=$(kubectl get configmap "${RULES_CONFIGMAP}" -n kube-system -o jsonpath='{.data.rules\.json}');
+            
+            if [ -z "$RULES_JSON" ]; then
+              echo "ERROR: Rules not found in ConfigMap";
+              exit 1;
+            fi
+            
+            # Создаём patch JSON
+            PATCH_JSON=$(cat <<EOFPATCH
+            {
+              "rules": ${RULES_JSON}
+            }
+            EOFPATCH
+            )
+            
+            echo "Patching ClusterRole ${ROLE_NAME} with rules from ConfigMap";
+            echo "${PATCH_JSON}" | kubectl patch clusterrole "${ROLE_NAME}" --type=merge -p "$(cat -)";
+            
+            echo "Creating ClusterRoleBinding";
+            kubectl apply -f - <<EOF
+            apiVersion: rbac.authorization.k8s.io/v1
+            kind: ClusterRoleBinding
+            metadata:
+              name: ${ROLE_NAME}-binding
+              labels:
+                app.kubernetes.io/part-of: argo-jit-rbac
+                jit-rbac/app: ${JIT_RBAC_APP}
+            roleRef:
+              apiGroup: rbac.authorization.k8s.io
+              kind: ClusterRole
+              name: ${ROLE_NAME}
+            subjects:
+            - kind: ServiceAccount
+              name: argocd-manager
+              namespace: kube-system
+            EOF
+            
+            echo "PreSync completed successfully";

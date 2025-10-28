@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: k8s-spb2-backend1-certmanager
+  name: k8s-spb2-backend3-certmanager
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "2"
@@ -14,40 +14,45 @@ spec:
     - FailOnSharedResource=false
   project: default
   destination:
-    name: kind-test-1
+    name: kind-test-3
     namespace: cert-manager
   sources:
+    # JIT RBAC: пустая роль + ConfigMap с правами
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
       path: shared/jit-rbac-roles
       directory:
         include: certmanager-role.yaml
+    # JIT RBAC hooks (PreSync + PostSync)
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
       path: shared/jit-rbac
       kustomize:
         commonLabels:
-          jit-rbac/app: k8s-spb2-backend1-certmanager
+          jit-rbac/app: k8s-spb2-backend3-certmanager
         patches:
           - target:
-              kind: ClusterRoleBinding
+              kind: Job
+              name: argocd-jit-rbac-patch-role
             patch: |-
               - op: replace
-                path: /metadata/name
-                value: argocd-manager-certmanager
+                path: /spec/template/spec/containers/0/env/1/value
+                value: certmanager-role
               - op: replace
-                path: /roleRef/name
-                value: argocd-manager-certmanager
+                path: /spec/template/spec/containers/0/env/2/value
+                value: jit-rbac-certmanager-rules
           - target:
               kind: Job
+              name: argocd-jit-rbac-clear-role
             patch: |-
               - op: replace
-                path: /metadata/name
-                value: argocd-jit-rbac-cleanup-certmanager
+                path: /spec/template/spec/containers/0/env/1/value
+                value: certmanager-role
+    # Cert-manager Helm chart
     - repoURL: 'https://github.com/nomad-mrkn/charts.git'
       targetRevision: HEAD
       path: cert-manager
       helm:
-        releaseName: k8s-spb2-backend1-certmanager
+        releaseName: k8s-spb2-backend3-certmanager
         values: |
           installCRDs: true

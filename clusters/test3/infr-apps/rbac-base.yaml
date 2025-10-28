@@ -13,7 +13,7 @@ spec:
   source:
     repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
     targetRevision: HEAD
-    path: clusters/test2/custom-resource
+    path: clusters/test3/custom-resource
     directory:
       include: clusterrole.yaml
   syncPolicy:
