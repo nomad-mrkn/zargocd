@@ -32,16 +32,21 @@ spec:
         command: ["/bin/sh","-lc"]
         args:
           - |
+            echo "=== JIT RBAC Cleanup (Keep Role) ===";
+            echo "App: ${JIT_RBAC_APP}";
+            
             echo "Getting ClusterRole name from CRB";
             ROLE_NAME=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o jsonpath='{.items[0].roleRef.name}' 2>/dev/null || echo "");
-            echo "Deleting temporary CRB by label selector";
+            
+            echo "Deleting temporary CRB by label selector (keeping ClusterRole)";
             kubectl delete clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --ignore-not-found=true;
+            
             if [ -n "$ROLE_NAME" ]; then
-              echo "Deleting temporary ClusterRole: $ROLE_NAME";
-              kubectl delete clusterrole "$ROLE_NAME" --ignore-not-found=true;
+              echo "ClusterRole '$ROLE_NAME' will be kept in cluster for future use";
             else
-              echo "No ClusterRole found to delete";
+              echo "No ClusterRole found";
             fi
+            
             echo "Deleting completed PostSync pods with label app.kubernetes.io/part-of=argo-jit-rbac";
             kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
-            echo "Done";
+            echo "Cleanup completed - ClusterRole preserved";

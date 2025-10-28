@@ -45,18 +45,11 @@ spec:
                 echo "Checking for temporary ClusterRoles...";
                 ROLES=$(kubectl get clusterrole -l app.kubernetes.io/part-of=argo-jit-rbac -o name 2>/dev/null | grep -v "argocd-manager-watcher" || echo "");
                 if [ -n "$ROLES" ]; then
-                  echo "Found temporary ClusterRoles:";
+                  echo "Found ClusterRoles (keeping them for reuse):";
                   echo "$ROLES";
-                  for role in $ROLES; do
-                    role_name=$(echo "$role" | cut -d'/' -f2);
-                    if [ "$role_name" != "argocd-manager-watcher" ]; then
-                      echo "Deleting ClusterRole: $role_name";
-                      kubectl delete clusterrole "$role_name" --ignore-not-found=true;
-                    fi
-                  done
-                  echo "Deleted temporary ClusterRoles";
+                  echo "ClusterRoles will be preserved for future deployments";
                 else
-                  echo "No temporary ClusterRoles found";
+                  echo "No ClusterRoles found";
                 fi
                 
                 echo "Checking for old cleanup pods...";
