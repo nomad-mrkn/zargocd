@@ -49,7 +49,8 @@ spec:
             fi
 
             echo "Deleting personal CronJob for this app";
-            kubectl delete cronjob -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --ignore-not-found=true;
+            CRONJOB_NAME="${JIT_RBAC_APP}-cleanup-cron";
+            kubectl delete cronjob "$CRONJOB_NAME" --ignore-not-found=true;
             
             
             echo "Deleting completed PostSync pods for this app";
