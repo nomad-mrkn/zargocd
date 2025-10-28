@@ -27,20 +27,11 @@ spec:
           jit-rbac/service: fluent-bit
         patches:
           - target:
-              kind: ClusterRole
+              kind: Job
             patch: |-
               - op: replace
                 path: /metadata/name
-                value: argocd-manager-fluent-bit
-          - target:
-              kind: ClusterRoleBinding
-            patch: |-
-              - op: replace
-                path: /metadata/name
-                value: argocd-manager-fluent-bit
-              - op: replace
-                path: /roleRef/name
-                value: argocd-manager-fluent-bit
+                value: argocd-jit-rbac-presync-prepare-fluent-bit
           - target:
               kind: Job
             patch: |-
