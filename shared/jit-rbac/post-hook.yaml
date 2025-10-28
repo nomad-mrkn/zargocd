@@ -9,21 +9,17 @@ metadata:
     argocd.argoproj.io/sync-wave: "99"
   labels:
     app.kubernetes.io/part-of: argo-jit-rbac
-    jit-rbac/service: PLACEHOLDER
 spec:
   backoffLimit: 0
-  activeDeadlineSeconds: 300
   ttlSecondsAfterFinished: 60
   template:
     metadata:
       labels:
         app.kubernetes.io/part-of: argo-jit-rbac
         jit-rbac/app: PLACEHOLDER
-        jit-rbac/service: PLACEHOLDER
     spec:
       serviceAccountName: argocd-manager
       restartPolicy: Never
-      terminationGracePeriodSeconds: 10
       containers:
       - name: cleanup
         image: bitnami/kubectl:latest
@@ -33,38 +29,26 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.labels['jit-rbac/app']
-        - name: JIT_RBAC_SERVICE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.labels['jit-rbac/service']
         command: ["/bin/sh","-lc"]
         args:
           - |
-            echo "=== JIT RBAC Final Cleanup (Self-Contained) ===";
-            echo "App: ${JIT_RBAC_APP} Service: ${JIT_RBAC_SERVICE}";
+            echo "=== JIT RBAC Cleanup (Keep Role, Clear Rules) ===";
+            echo "App: ${JIT_RBAC_APP}";
             
             echo "Getting ClusterRole name from CRB";
-            ROLE_NAME=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP},jit-rbac/service=${JIT_RBAC_SERVICE} -o jsonpath='{.items[0].roleRef.name}' 2>/dev/null || echo "");
+            ROLE_NAME=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o jsonpath='{.items[0].roleRef.name}' 2>/dev/null || echo "");
             
             echo "Deleting temporary CRB by label selector (keeping ClusterRole)";
-            kubectl delete clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP},jit-rbac/service=${JIT_RBAC_SERVICE} --ignore-not-found=true;
+            kubectl delete clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --ignore-not-found=true;
             
             if [ -n "$ROLE_NAME" ]; then
               echo "Clearing rules of ClusterRole: $ROLE_NAME";
               kubectl patch clusterrole "$ROLE_NAME" --type=merge -p '{"rules": []}' || echo "Patch failed";
-              echo "ClusterRole '$ROLE_NAME' kept with empty rules for future reuse";
+              echo "ClusterRole '$ROLE_NAME' kept with empty rules";
             else
               echo "No ClusterRole found";
             fi
             
-            echo "Ensuring base watcher CRB exists";
-            kubectl get clusterrolebinding argocd-manager-watcher >/dev/null 2>&1 || {
-              echo "Base watcher CRB missing, this should not happen";
-            }
-            
-            echo "Cleaning up any orphaned JIT CRBs (not app-specific)";
-            kubectl delete clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac --field-selector=metadata.name!=argocd-manager-watcher --ignore-not-found=true || true;
-            
-            echo "Deleting completed PostSync pods";
-            kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP},jit-rbac/service=${JIT_RBAC_SERVICE} --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
-            echo "Cleanup completed - Only base watcher CRB and empty app role remain";
+            echo "Deleting completed PostSync pods with label app.kubernetes.io/part-of=argo-jit-rbac";
+            kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
+            echo "Cleanup completed - ClusterRole preserved with empty rules";

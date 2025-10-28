@@ -21,4 +21,3 @@ spec:
     path: clusters/test1/custom-resource
     directory:
       include: cleanup-cronjob.yaml
-

@@ -24,18 +24,24 @@ spec:
       kustomize:
         commonLabels:
           jit-rbac/app: k8s-spb2-backend1-fluent-bit
-          jit-rbac/service: fluent-bit
         patches:
           - target:
-              kind: Job
-              name: argocd-jit-rbac-presync-prepare
+              kind: ClusterRole
             patch: |-
               - op: replace
                 path: /metadata/name
-                value: argocd-jit-rbac-presync-prepare-fluent-bit
+                value: argocd-manager-fluent-bit
+          - target:
+              kind: ClusterRoleBinding
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: argocd-manager-fluent-bit
+              - op: replace
+                path: /roleRef/name
+                value: argocd-manager-fluent-bit
           - target:
               kind: Job
-              name: argocd-jit-rbac-cleanup
             patch: |-
               - op: replace
                 path: /metadata/name

@@ -28,14 +28,12 @@ spec:
         patches:
           - target:
               kind: Job
-              name: argocd-jit-rbac-presync-prepare
             patch: |-
               - op: replace
                 path: /metadata/name
                 value: argocd-jit-rbac-presync-prepare-certmanager
           - target:
               kind: Job
-              name: argocd-jit-rbac-cleanup
             patch: |-
               - op: replace
                 path: /metadata/name
