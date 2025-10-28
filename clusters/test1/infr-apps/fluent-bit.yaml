@@ -24,6 +24,7 @@ spec:
       kustomize:
         commonLabels:
           jit-rbac/app: k8s-spb2-backend1-fluent-bit
+          jit-rbac/service: fluent-bit
         patches:
           - target:
               kind: ClusterRole

@@ -4,7 +4,7 @@ metadata:
   name: argocd-manager-fluent-bit
   annotations:
     argocd.argoproj.io/sync-wave: "0"
-    argocd.argoproj.io/sync-options: Prune=false
+    # argocd.argoproj.io/sync-options: Prune=false
   labels:
     app.kubernetes.io/part-of: argo-jit-rbac
     jit-rbac/app: k8s-spb2-backend1-fluent-bit
