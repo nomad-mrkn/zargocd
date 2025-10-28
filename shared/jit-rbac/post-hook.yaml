@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: argocd-jit-rbac-cleanup
+  name: APP_NAME_PLACEHOLDER-cleanup
   namespace: kube-system
   annotations:
     argocd.argoproj.io/hook: PostSync
@@ -9,6 +9,7 @@ metadata:
     argocd.argoproj.io/sync-wave: "99"
   labels:
     app.kubernetes.io/part-of: argo-jit-rbac
+    jit-rbac/app: APP_NAME_PLACEHOLDER
 spec:
   backoffLimit: 0
   ttlSecondsAfterFinished: 60

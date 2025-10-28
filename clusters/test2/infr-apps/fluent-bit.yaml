@@ -46,6 +46,12 @@ spec:
               - op: replace
                 path: /metadata/name
                 value: k8s-spb2-backend2-fluent-bit-cleanup-cron
+          - target:
+              kind: Job
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: k8s-spb2-backend2-fluent-bit-cleanup
     # JIT RBAC role definition - заполняет пустую роль правилами
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
