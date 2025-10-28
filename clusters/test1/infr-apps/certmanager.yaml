@@ -24,14 +24,22 @@ spec:
       kustomize:
         commonLabels:
           jit-rbac/app: k8s-spb2-backend1-certmanager
-          jit-rbac/service: certmanager
         patches:
           - target:
-              kind: Job
+              kind: ClusterRole
             patch: |-
               - op: replace
                 path: /metadata/name
-                value: argocd-jit-rbac-presync-prepare-certmanager
+                value: argocd-manager-certmanager
+          - target:
+              kind: ClusterRoleBinding
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: argocd-manager-certmanager
+              - op: replace
+                path: /roleRef/name
+                value: argocd-manager-certmanager
           - target:
               kind: Job
             patch: |-
