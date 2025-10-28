@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: k8s-spb1-backend1-jit-rbac-cleanup-cron
+  name: k8s-spb2-backend1-jit-rbac-cleanup-cron
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "1"
