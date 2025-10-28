@@ -30,6 +30,8 @@ spec:
           jit-rbac/app: k8s-spb2-backend1-certmanager
         patches:
           - target:
+              group: batch
+              version: v1
               kind: Job
               name: argocd-jit-rbac-ensure-empty-role
             patch: |-
@@ -37,6 +39,8 @@ spec:
                 path: /spec/template/spec/containers/0/env/1/value
                 value: argocd-manager-certmanager
           - target:
+              group: batch
+              version: v1
               kind: Job
               name: argocd-jit-rbac-enrich-role
             patch: |-
@@ -47,6 +51,8 @@ spec:
                 path: /spec/template/spec/containers/0/env/2/value
                 value: jit-rbac-certmanager-rules
           - target:
+              group: batch
+              version: v1
               kind: Job
               name: argocd-jit-rbac-clear-role
             patch: |-
