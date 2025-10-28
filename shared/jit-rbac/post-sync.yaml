@@ -39,13 +39,15 @@ spec:
             echo "Application: ${JIT_RBAC_APP}";
             echo "Role: ${ROLE_NAME}";
             
+            # Удаляем ClusterRoleBinding
             echo "Deleting ClusterRoleBinding";
             kubectl delete clusterrolebinding "${ROLE_NAME}-binding" --ignore-not-found=true;
             
-            echo "Clearing ClusterRole ${ROLE_NAME} (patching to empty rules)";
+            # Очищаем роль (возвращаем к пустому состоянию)
+            echo "Clearing ClusterRole ${ROLE_NAME} (removing all permissions)";
             kubectl patch clusterrole "${ROLE_NAME}" --type=merge -p '{"rules":[]}';
             
-            echo "Deleting completed PostSync pods";
-            kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
+            # Очищаем метки приложения, но оставляем роль для переиспользования
+            kubectl label clusterrole "${ROLE_NAME}" jit-rbac/app- || true;
             
-            echo "PostSync cleanup completed";
+            echo "PostSync cleanup completed. Role ${ROLE_NAME} is now empty and ready for reuse";

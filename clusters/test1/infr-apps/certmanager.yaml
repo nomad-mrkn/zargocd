@@ -27,7 +27,7 @@ spec:
         patches:
           - target:
               kind: Job
-              name: argocd-jit-rbac-patch-role
+              name: argocd-jit-rbac-enrich-role
             patch: |-
               - op: replace
                 path: /spec/template/spec/containers/0/env/1/value
