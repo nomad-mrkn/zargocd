@@ -34,7 +34,7 @@ subjects:
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: argocd-jit-rbac-cleanup-cron
+  name: ROLE_NAME_PLACEHOLDER-cleanup-cron
   namespace: kube-system
   annotations:
     argocd.argoproj.io/hook: PreSync
