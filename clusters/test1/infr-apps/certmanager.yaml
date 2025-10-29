@@ -55,7 +55,7 @@ spec:
       targetRevision: HEAD
       path: shared/jit-rbac-roles
       directory:
-        include: certmanager-role.yaml
+        include: certmanager-patch.yaml
     - repoURL: 'https://github.com/nomad-mrkn/charts.git'
       targetRevision: HEAD
       path: cert-manager

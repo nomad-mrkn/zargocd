@@ -55,7 +55,7 @@ spec:
       targetRevision: HEAD
       path: shared/jit-rbac-roles
       directory:
-        include: fluent-bit-role.yaml
+        include: fluent-bit-patch.yaml
     - repoURL: 'https://github.com/nomad-mrkn/charts.git'
       targetRevision: HEAD
       path: fluent-bit
