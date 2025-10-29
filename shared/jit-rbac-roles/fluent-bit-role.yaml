@@ -9,7 +9,6 @@ metadata:
     app.kubernetes.io/part-of: argo-jit-rbac
     jit-rbac/app: k8s-spb2-backend1-fluent-bit
 rules:
-  # Fluent-bit DaemonSet deployment
   - apiGroups: ["apps"]
     resources:
       - daemonsets
@@ -17,7 +16,6 @@ rules:
       - replicasets
     verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
   
-  # Core resources
   - apiGroups: [""]
     resources:
       - serviceaccounts
@@ -38,7 +36,6 @@ rules:
     resources: ["nodes", "nodes/proxy"]
     verbs: ["get", "list", "watch"]
   
-  # RBAC for fluent-bit service account
   - apiGroups: ["rbac.authorization.k8s.io"]
     resources:
       - clusterroles
@@ -47,33 +44,27 @@ rules:
       - rolebindings
     verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
   
-  # Monitoring integration
   - apiGroups: ["monitoring.coreos.com"]
     resources:
       - servicemonitors
       - prometheusrules
     verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
   
-  # Network policies
   - apiGroups: ["networking.k8s.io"]
     resources:
       - networkpolicies
     verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
   
-  # PodSecurityPolicy
   - apiGroups: ["policy"]
     resources:
       - podsecuritypolicies
     verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
   
-  # Autoscaling
   - apiGroups: ["autoscaling.k8s.io"]
     resources:
       - verticalpodautoscalers
     verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
   
-  # Jobs for hooks
   - apiGroups: ["batch"]
     resources: ["jobs"]
     verbs: ["create", "delete", "list", "get", "watch", "update"]
-
