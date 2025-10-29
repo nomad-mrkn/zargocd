@@ -33,4 +33,3 @@ spec:
         automated:
           prune: true
           selfHeal: false
-          
