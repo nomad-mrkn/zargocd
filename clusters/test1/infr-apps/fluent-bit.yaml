@@ -35,7 +35,7 @@ spec:
             patch: |-
               - op: replace
                 path: /metadata/name
-                value: argocd-manager-fluent-bit-install
+                value: argocd-manager-fluent-bit
               - op: replace
                 path: /roleRef/name
                 value: argocd-manager-fluent-bit
@@ -53,9 +53,7 @@ spec:
                 value: k8s-spb2-backend1-fluent-bit-cleanup
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
-      path: shared/jit-rbac-roles
-      directory:
-        include: fluent-bit-role.yaml
+      path: shared/jit-rbac-roles/fluent-bit-patch.yaml
     - repoURL: 'https://github.com/nomad-mrkn/charts.git'
       targetRevision: HEAD
       path: fluent-bit
