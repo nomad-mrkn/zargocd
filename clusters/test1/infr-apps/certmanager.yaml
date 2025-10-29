@@ -65,3 +65,5 @@ spec:
         releaseName: k8s-spb2-backend1-certmanager
         values: |
           installCRDs: true
+          startupapicheck:
+           enabled: false
