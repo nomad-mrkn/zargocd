@@ -33,27 +33,13 @@ spec:
         command: ["/bin/sh","-lc"]
         args:
           - |
-            echo "=== JIT RBAC PostSync Cleanup ===";
-            echo "App: ${JIT_RBAC_APP}";
-            
-            echo "Getting ClusterRole name from CRB";
             ROLE_NAME=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o jsonpath='{.items[0].roleRef.name}' 2>/dev/null || echo "");
-            
-            echo "Deleting temporary CRB for this app";
             kubectl delete clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --ignore-not-found=true;
-            
             if [ -n "$ROLE_NAME" ]; then
-              echo "Clearing rules for ClusterRole: $ROLE_NAME";
               kubectl patch clusterrole "$ROLE_NAME" --type=merge -p '{"rules": []}' || echo "Patch failed";
             else
               echo "No ClusterRole found to clear";
             fi
-
-            echo "Deleting personal CronJob for this app";
             CRONJOB_NAME="${JIT_RBAC_APP}-cleanup-cron";
             kubectl delete cronjob "$CRONJOB_NAME" --ignore-not-found=true;
-            
-            
-            echo "Deleting completed PostSync pods for this app";
             kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
-            echo "PostSync cleanup completed - ClusterRole preserved with empty rules";

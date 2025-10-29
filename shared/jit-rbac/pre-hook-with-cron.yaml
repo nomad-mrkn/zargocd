@@ -44,7 +44,7 @@ metadata:
     app.kubernetes.io/part-of: argo-jit-rbac
     jit-rbac/app: APP_NAME_PLACEHOLDER
 spec:
-  schedule: "*/5 * * * *"  # каждые 5 минут
+  schedule: "*/5 * * * *"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
@@ -67,20 +67,9 @@ spec:
             command: ["/bin/sh", "-c"]
             args:
               - |
-                echo "=== JIT RBAC Cleanup Cron for ${JIT_RBAC_APP} ===";
                 echo "Starting cleanup at $(date)";
-                
-                echo "Checking for temporary CRB for this app...";
                 CRB_EXISTS=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o name 2>/dev/null || echo "");
-                if [ -n "$CRB_EXISTS" ]; then
-                  echo "Found CRB for ${JIT_RBAC_APP} - keeping it (app still running)";
-                else
-                  echo "No CRB found for ${JIT_RBAC_APP} - app may have finished";
-                fi
-                
-                echo "Cleaning up old cleanup pods for this app...";
                 kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
-                
                 echo "Cleanup completed at $(date)";
             env:
             - name: JIT_RBAC_APP
