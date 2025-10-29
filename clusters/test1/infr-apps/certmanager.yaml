@@ -53,7 +53,9 @@ spec:
                 value: k8s-spb2-backend1-certmanager-cleanup
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
-      path: shared/jit-rbac-roles/certmanager-patch.yaml
+      path: shared/jit-rbac-roles
+      directory:
+        include: certmanager-role.yaml
     - repoURL: 'https://github.com/nomad-mrkn/charts.git'
       targetRevision: HEAD
       path: cert-manager

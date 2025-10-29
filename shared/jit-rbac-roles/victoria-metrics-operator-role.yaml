@@ -1,0 +1,146 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argocd-manager-victoria-metrics-operator
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+    argocd.argoproj.io/sync-options: Prune=false
+  labels:
+    app.kubernetes.io/part-of: argo-jit-rbac
+    jit-rbac/app: k8s-spb2-backend1-victoria-metrics-operator
+rules:
+  # VictoriaMetrics CRDs
+  - apiGroups: ["apiextensions.k8s.io"]
+    resources: ["customresourcedefinitions"]
+    verbs: ["create", "update", "patch", "get", "list", "watch"]
+  
+  # VictoriaMetrics Operator CRs
+  - apiGroups: ["operator.victoriametrics.com"]
+    resources:
+      - vmagents
+      - vmagents/status
+      - vmagents/finalizers
+      - vmalerts
+      - vmalerts/status
+      - vmalerts/finalizers
+      - vmalertmanagers
+      - vmalertmanagers/status
+      - vmalertmanagers/finalizers
+      - vmauthes
+      - vmauthes/status
+      - vmauthes/finalizers
+      - vmclusters
+      - vmclusters/status
+      - vmclusters/finalizers
+      - vmnodescrapes
+      - vmnodescrapes/status
+      - vmpodscrapes
+      - vmpodscrapes/status
+      - vmprobes
+      - vmprobes/status
+      - vmrules
+      - vmrules/status
+      - vmservicescrapes
+      - vmservicescrapes/status
+      - vmsingles
+      - vmsingles/status
+      - vmsingles/finalizers
+      - vmstaticscrapes
+      - vmstaticscrapes/status
+      - vmusers
+      - vmusers/status
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  # Webhooks and API services
+  - apiGroups: ["admissionregistration.k8s.io"]
+    resources:
+      - mutatingwebhookconfigurations
+      - validatingwebhookconfigurations
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  - apiGroups: ["apiregistration.k8s.io"]
+    resources:
+      - apiservices
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  # Cert-manager integration (if used)
+  - apiGroups: ["cert-manager.io"]
+    resources:
+      - certificates
+      - issuers
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  # Core resources for operator deployment
+  - apiGroups: ["apps"]
+    resources:
+      - deployments
+      - replicasets
+      - statefulsets
+      - daemonsets
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  - apiGroups: [""]
+    resources:
+      - serviceaccounts
+      - services
+      - configmaps
+      - secrets
+      - pods
+      - events
+      - endpoints
+      - persistentvolumeclaims
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  - apiGroups: [""]
+    resources: ["configmaps/status"]
+    verbs: ["get", "update", "patch"]
+  
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["create", "get", "list", "watch"]
+  
+  # RBAC for operator service accounts
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources:
+      - roles
+      - rolebindings
+      - clusterroles
+      - clusterrolebindings
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete", "bind", "escalate"]
+  
+  # Monitoring resources
+  - apiGroups: ["monitoring.coreos.com"]
+    resources:
+      - servicemonitors
+      - podmonitors
+      - prometheusrules
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  # Autoscaling
+  - apiGroups: ["autoscaling"]
+    resources:
+      - horizontalpodautoscalers
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  - apiGroups: ["autoscaling.k8s.io"]
+    resources:
+      - verticalpodautoscalers
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  # Policy
+  - apiGroups: ["policy"]
+    resources:
+      - poddisruptionbudgets
+      - podsecuritypolicies
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  # Coordination for leader election
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["create", "update", "patch", "get", "list", "watch"]
+  
+  # Jobs for hooks
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["create", "delete", "list", "get", "watch", "update"]
+
