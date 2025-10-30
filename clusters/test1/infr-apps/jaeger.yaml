@@ -56,9 +56,9 @@ spec:
       path: shared/jit-rbac-roles
       directory:
         include: jaeger-role.yaml
-    - repoURL: 'https://github.com/nomad-mrkn/charts.git'
-      targetRevision: HEAD
-      path: jaeger-operator
+    - repoURL: 'https://jaegertracing.github.io/helm-charts'
+      chart: jaeger
+      targetRevision: 0.73.1
       helm:
         releaseName: k8s-spb2-backend1-jaeger
         values: |
