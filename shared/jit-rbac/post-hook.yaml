@@ -17,7 +17,7 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/part-of: argo-jit-rbac
-        jit-rbac/app: PLACEHOLDER
+        jit-rbac/app: APP_NAME_PLACEHOLDER
     spec:
       serviceAccountName: argocd-manager
       restartPolicy: Never
