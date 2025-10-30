@@ -58,9 +58,9 @@ spec:
       path: shared/jit-rbac-roles
       directory:
         include: keda-role.yaml
-    - repoURL: 'https://github.com/nomad-mrkn/charts.git'
-      targetRevision: HEAD
+    - repoURL: 'https://kedacore.github.io/charts'
       chart: keda
+      targetRevision: 2.16.1
       helm:
         releaseName: k8s-spb2-backend1-keda
         valuesObject:
