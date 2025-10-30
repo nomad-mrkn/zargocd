@@ -58,7 +58,7 @@ spec:
         include: jaeger-role.yaml
     - repoURL: 'https://github.com/nomad-mrkn/charts.git'
       targetRevision: HEAD
-      path: jaeger
+      path: jaeger-operator
       helm:
         releaseName: k8s-spb2-backend1-jaeger
         values: |
