@@ -76,6 +76,12 @@ spec:
               tag: 2.16.1
           webhooks:
             enabled: false
+            certManager:
+              enabled: false
+            generateCertificates: false
+          operator:
+            tls:
+              enabled: false
           crds:
             install: true
           tolerations:
