@@ -9,7 +9,6 @@ metadata:
     argocd.argoproj.io/sync-wave: "-1"
   labels:
     app.kubernetes.io/part-of: argo-jit-rbac
-    jit-rbac/app: APP_NAME_PLACEHOLDER
 spec:
   schedule: "*/5 * * * *"
   successfulJobsHistoryLimit: 1
@@ -25,7 +24,6 @@ spec:
         metadata:
           labels:
             app.kubernetes.io/part-of: argo-jit-rbac
-            jit-rbac/app: APP_NAME_PLACEHOLDER
         spec:
           serviceAccountName: argocd-manager
           restartPolicy: Never

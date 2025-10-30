@@ -9,7 +9,6 @@ metadata:
     argocd.argoproj.io/sync-wave: "99"
   labels:
     app.kubernetes.io/part-of: argo-jit-rbac
-    jit-rbac/app: APP_NAME_PLACEHOLDER
 spec:
   backoffLimit: 0
   ttlSecondsAfterFinished: 60
@@ -17,7 +16,6 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/part-of: argo-jit-rbac
-        jit-rbac/app: PLACEHOLDER
     spec:
       serviceAccountName: argocd-manager
       restartPolicy: Never
