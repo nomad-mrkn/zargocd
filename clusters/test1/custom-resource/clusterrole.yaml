@@ -53,7 +53,7 @@ rules:
     verbs: ["create", "list"]
   - apiGroups: [""]
     resources: ["namespaces"]
-    verbs: ["create", "get", "list", "watch"]
+    verbs: ["create", "get", "list", "watch", "patch"]
   - apiGroups: ["rbac.authorization.k8s.io"]
     resources: ["clusterrolebindings"]
     verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
