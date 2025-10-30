@@ -31,7 +31,7 @@ spec:
                 set -euo pipefail
                 echo "Starting at $(date -u +%FT%TZ)"
 
-                AGE_THRESHOLD_MIN=${AGE_THRESHOLD_MIN:-4}
+                AGE_THRESHOLD_MIN=${AGE_THRESHOLD_MIN:-15}
                 WATCHER="argocd-manager-watcher"
                 now_epoch=$(date -u +%s)
 
