@@ -67,7 +67,7 @@ spec:
           image:
             registry: ghcr.io
             repository: kyverno/policy-reporter
-            tag: v2.20.1
+            tag: 2.20.1
           logging:
             encoding: json
           monitoring:
