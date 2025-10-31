@@ -45,13 +45,13 @@ spec:
             patch: |-
               - op: replace
                 path: /metadata/name
-                value: k8s-spb2-backend1-node-feature-discovery-cleanup-cron
+                value: k8s-spb2-backend1-nfd-cleanup-cron
           - target:
               kind: Job
             patch: |-
               - op: replace
                 path: /metadata/name
-                value: k8s-spb2-backend1-node-feature-discovery-cleanup
+                value: k8s-spb2-backend1-nfd-cleanup
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
       path: shared/jit-rbac-roles
