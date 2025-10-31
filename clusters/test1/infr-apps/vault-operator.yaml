@@ -10,6 +10,7 @@ spec:
     automated:
       prune: false
     syncOptions:
+    - CreateNamespace=true
     - FailOnSharedResource=false
   project: default
   destination:
