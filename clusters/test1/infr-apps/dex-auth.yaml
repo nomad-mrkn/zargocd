@@ -14,7 +14,7 @@ spec:
     - FailOnSharedResource=false
   project: default
   destination:
-    name: k8s-spb2-backend1
+    name: kind-test-1
     namespace: kube-system
   sources:
     # JIT RBAC hooks (PreSync + PostSync)

@@ -14,7 +14,7 @@ spec:
   project: default
   destination:
     namespace: kube-system
-    name: k8s-spb2-backend1
+    name: kind-test-1
   sources:
     # JIT RBAC hooks (PreSync + PostSync)
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
