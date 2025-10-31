@@ -49,7 +49,7 @@ spec:
                   if [ ${age_min} -ge ${AGE_THRESHOLD_MIN} ]; then
                     # Если CRB висит более 15 минут - очищаем CR и удаляем CRB
                     echo "CRB '${crb_name}' is ${age_min} minutes old, clearing CR '${role_name}' rules and deleting CRB"
-                    timeout 30 kubectl patch clusterrole "${role_name}" --type=merge -p '{"rules": []}' --ignore-not-found=true || true
+                    timeout 30 kubectl patch clusterrole "${role_name}" --type=merge -p '{"rules": []}' || true
                     timeout 30 kubectl delete clusterrolebinding "${crb_name}" --ignore-not-found=true --force --grace-period=0 || true
                   fi
                 done
