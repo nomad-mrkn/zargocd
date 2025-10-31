@@ -47,10 +47,12 @@ spec:
                   age_min=$(( (now_epoch - crb_epoch) / 60 ))
 
                   if [ ${age_min} -ge ${AGE_THRESHOLD_MIN} ]; then
-                    kubectl get clusterrole "${role_name}" >/dev/null 2>&1 && \
-                      timeout 30 kubectl patch clusterrole "${role_name}" --type=merge -p '{"rules": []}' || true
-                    
-                    timeout 30 kubectl delete clusterrolebinding "${crb_name}" --ignore-not-found=true --force --grace-period=0 || true
+                    RULES_VAL=$(kubectl get clusterrole "${role_name}" -o jsonpath='{.rules}' 2>/dev/null || echo "")
+                    if [ "${RULES_VAL}" = "[]" ] || [ -z "${RULES_VAL}" ]; then
+                      timeout 30 kubectl delete clusterrolebinding "${crb_name}" --ignore-not-found=true --force --grace-period=0 || true
+                    else
+                      continue
+                    fi
                   fi
                 done
 
