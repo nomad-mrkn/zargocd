@@ -11,6 +11,7 @@ spec:
       prune: false
     syncOptions:
     - FailOnSharedResource=false
+    - CreateNamespace=true
   project: default
   destination:
     name: kind-test-1
