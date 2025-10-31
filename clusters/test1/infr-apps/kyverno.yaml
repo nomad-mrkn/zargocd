@@ -1,0 +1,219 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: k8s-spb2-backend1-kyverno
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
+    - FailOnSharedResource=true
+    - ServerSideApply=true
+    automated:
+      prune: false
+      selfHeal: false
+  project: default
+  destination:
+    name: kind-test-1
+    namespace: kyverno
+  sources:
+    - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+      targetRevision: HEAD
+      path: shared/jit-rbac
+      kustomize:
+        commonLabels:
+          jit-rbac/app: k8s-spb2-backend1-kyverno
+        patches:
+          - target:
+              kind: ClusterRole
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: argocd-manager-kyverno
+          - target:
+              kind: ClusterRoleBinding
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: argocd-manager-kyverno
+              - op: replace
+                path: /roleRef/name
+                value: argocd-manager-kyverno
+          - target:
+              kind: CronJob
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: k8s-spb2-backend1-kyverno-cleanup-cron
+          - target:
+              kind: Job
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: k8s-spb2-backend1-kyverno-cleanup
+    - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+      targetRevision: HEAD
+      path: shared/jit-rbac-roles
+      directory:
+        include: kyverno-role.yaml
+    - repoURL: 'https://github.com/nomad-mrkn/charts.git'
+      targetRevision: HEAD
+      path: kyverno
+      helm:
+        releaseName: kyverno
+        values: |
+          webhooksCleanup:
+            image:
+              registry: registry.k8s.io
+              repository: kubectl
+              tag: v1.26.4
+          features:
+            policyExceptions:
+              enabled: true
+          cleanupJobs:
+            admissionReports:
+              image:
+                registry: registry.k8s.io
+                repository: kubectl
+                tag: v1.26.4
+              resources:
+                limits:
+                  memory: 1G
+                  cpu: 1
+                requests:
+                  memory: 128Mi
+                  cpu: 100m
+            clusterAdmissionReports:
+              image:
+                registry: registry.k8s.io
+                repository: kubectl
+                tag: v1.26.4
+              resources:
+                limits:
+                  memory: 1G
+                  cpu: 1
+                requests:
+                  memory: 128Mi
+                  cpu: 100m
+            updateRequests:
+              image:
+                registry: registry.k8s.io
+                repository: kubectl
+                tag: v1.26.4
+              resources:
+                limits:
+                  memory: 1G
+                  cpu: 1
+                requests:
+                  memory: 128Mi
+                  cpu: 100m
+            ephemeralReports:
+              image:
+                registry: registry.k8s.io
+                repository: kubectl
+                tag: v1.26.4
+              resources:
+                limits:
+                  memory: 1G
+                  cpu: 1
+                requests:
+                  memory: 128Mi
+                  cpu: 100m
+            clusterEphemeralReports:
+              image:
+                registry: registry.k8s.io
+                repository: kubectl
+                tag: v1.26.4
+              resources:
+                limits:
+                  memory: 1G
+                  cpu: 1
+                requests:
+                  memory: 128Mi
+                  cpu: 100m
+          admissionController:
+            initContainer:
+              image:
+                registry: ghcr.io
+                repository: kyverno/kyvernopre
+                tag: v1.12.5
+            container:
+              extraArgs:
+                loggingFormat: json
+              image:
+                registry: ghcr.io
+                repository: kyverno/kyverno
+                tag: v1.12.5
+              resources:
+                limits:
+                  memory: 1G
+                  cpu: 1
+          backgroundController:
+            rbac:
+              clusterRole:
+                extraResources:
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - namespaces
+                    verbs:
+                      - patch
+                      - update
+            extraArgs:
+              loggingFormat: json
+            image:
+              registry: ghcr.io
+              repository: kyverno/background-controller
+              tag: v1.12.5
+            resources:
+              limits:
+                memory: 4G
+                cpu: 1
+          cleanupController:
+            rbac:
+              clusterRole:
+                extraResources:
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - namespaces
+                    verbs:
+                      - delete
+            extraArgs:
+              loggingFormat: json
+            image:
+              registry: ghcr.io
+              repository: kyverno/cleanup-controller
+              tag: v1.12.5
+            resources:
+              limits:
+                memory: 512Mi
+                cpu: 500m
+          reportsController:
+            resources:
+              limits:
+                memory: 4G
+                cpu: 2
+              requests:
+                cpu: 100m
+                memory: 128Mi
+            extraArgs:
+              loggingFormat: json
+            image:
+              registry: ghcr.io
+              repository: kyverno/reports-controller
+              tag: v1.12.5
+          tolerations:
+            - key: "node-role.kubernetes.io/infr"
+              operator: "Exists"
+              effect: "NoSchedule"
+          affinity:
+            nodeAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 1
+                  preference:
+                    matchExpressions:
+                      - key: "node-role.kubernetes.io/infr"
+                        operator: "Exists"

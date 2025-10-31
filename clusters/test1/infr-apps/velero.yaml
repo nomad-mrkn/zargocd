@@ -1,0 +1,110 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: k8s-spb2-backend1-velero
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  syncPolicy:
+    automated:
+      prune: false
+    syncOptions:
+    - FailOnSharedResource=false
+    - CreateNamespace=true
+  project: default
+  destination:
+    name: kind-test-1
+    namespace: velero
+  sources:
+    - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+      targetRevision: HEAD
+      path: shared/jit-rbac
+      kustomize:
+        commonLabels:
+          jit-rbac/app: k8s-spb2-backend1-velero
+        patches:
+          - target:
+              kind: ClusterRole
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: argocd-manager-velero
+          - target:
+              kind: ClusterRoleBinding
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: argocd-manager-velero
+              - op: replace
+                path: /roleRef/name
+                value: argocd-manager-velero
+          - target:
+              kind: CronJob
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: k8s-spb2-backend1-velero-cleanup-cron
+          - target:
+              kind: Job
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: k8s-spb2-backend1-velero-cleanup
+    - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+      targetRevision: HEAD
+      path: shared/jit-rbac-roles
+      directory:
+        include: velero-role.yaml
+    - repoURL: 'https://github.com/nomad-mrkn/charts.git'
+      targetRevision: HEAD
+      path: velero
+      helm:
+        releaseName: velero
+        values: |
+          image:
+            repository: docker.io/velero/velero
+            tag: v1.12.3
+          initContainers:
+            - image: docker.io/velero/velero-plugin-for-aws:v1.8.2
+              imagePullPolicy: IfNotPresent
+              name: velero-plugin-for-aws
+              volumeMounts:
+                - mountPath: /target
+                  name: plugins
+          kubectl:
+            image:
+              repository: docker.io/bitnami/kubectl
+              tag: 1.26.4
+          configuration:
+            provider: aws
+            backupStorageLocation:
+              name: default
+              provider: aws
+              default: true
+              bucket: k8s-backups
+              accessMode: ReadWrite
+              config:
+                s3ForcePathStyle: true
+                s3Url: https://s3.amazonaws.com
+            volumeSnapshotLocation:
+              name: default
+              provider: aws
+          credentials:
+            useSecret: false
+          schedules:
+            k8s-spb2-backend1:
+              disabled: false
+              labels:
+                myenv: dailybackup
+              annotations:
+                myenv: dailybackup
+              schedule: "0 3 * * *"
+              useOwnerReferencesInBackup: false
+              template:
+                ttl: "792h"
+                excludedNamespaces:
+                  - kube-system
+                  - kyverno
+                excludedResources:
+                  - horizontalpodautoscalers.autoscaling
