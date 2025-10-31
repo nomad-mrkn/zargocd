@@ -67,5 +67,5 @@ spec:
             repository: k8s.gcr.io/nfd/node-feature-discovery
           workercpumodel:
             image:
-              repository: docker.io/alpine
+              repository: mirror.gcr.io/library/alpine
               tag: 3.17
