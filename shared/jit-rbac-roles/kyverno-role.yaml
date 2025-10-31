@@ -45,6 +45,13 @@ rules:
       - roles
       - rolebindings
     verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+  
+  # Cluster-scoped RBAC for Helm hooks (migration, etc)
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources:
+      - clusterroles
+      - clusterrolebindings
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
 
   # Leader election
   - apiGroups: ["coordination.k8s.io"]
@@ -58,4 +65,10 @@ rules:
       - services
       - ingresses
     verbs: ["get", "list", "watch"]
+
+  # Jobs for Helm hooks (migration, cleanup)
+  - apiGroups: ["batch"]
+    resources:
+      - jobs
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
 
