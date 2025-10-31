@@ -33,6 +33,12 @@ rules:
       - replicasets
     verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
 
+  # Scale subresource required by Kyverno roles (admission-controller)
+  - apiGroups: ["apps"]
+    resources:
+      - deployments/scale
+    verbs: ["get", "list", "watch", "patch", "update"]
+
   # Namespace-scoped RBAC for kyverno
   - apiGroups: ["rbac.authorization.k8s.io"]
     resources:
@@ -44,7 +50,7 @@ rules:
   - apiGroups: ["coordination.k8s.io"]
     resources:
       - leases
-    verbs: ["create", "update", "patch", "get", "list", "watch"]
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
 
   # Network access objects if needed by services
   - apiGroups: ["networking.k8s.io"]
