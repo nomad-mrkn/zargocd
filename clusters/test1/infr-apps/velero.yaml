@@ -92,6 +92,8 @@ spec:
               provider: aws
           credentials:
             useSecret: false
+          rbac:
+            clusterAdministrator: false
           schedules:
             k8s-spb2-backend1:
               disabled: false

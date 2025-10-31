@@ -69,6 +69,12 @@ spec:
               registry: registry.k8s.io
               repository: kubectl
               tag: v1.26.4
+          policyReportsCleanup:
+            enabled: true
+            image:
+              registry: registry.k8s.io
+              repository: kubectl
+              tag: v1.26.4
           features:
             policyExceptions:
               enabled: true
