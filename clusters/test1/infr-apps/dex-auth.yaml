@@ -12,7 +12,7 @@ spec:
       selfHeal: true
     syncOptions:
     - FailOnSharedResource=false
-  project: k8s-spb2-backend1
+  project: default
   destination:
     name: k8s-spb2-backend1
     namespace: kube-system
