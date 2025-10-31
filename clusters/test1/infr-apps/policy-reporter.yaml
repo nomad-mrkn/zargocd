@@ -63,12 +63,12 @@ spec:
       helm:
         releaseName: policy-reporter
         values: |
-          logging:
-            encoding: json
           image:
             registry: ghcr.io
             repository: kyverno/policy-reporter
             tag: 2.24.1
+          logging:
+            encoding: json
           monitoring:
             enabled: true
           resources:
