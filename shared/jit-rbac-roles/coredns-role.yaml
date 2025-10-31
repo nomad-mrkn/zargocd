@@ -24,4 +24,3 @@ rules:
   - apiGroups: ["monitoring.coreos.com"]
     resources: ["servicemonitors", "prometheusrules"]
     verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
-
