@@ -66,18 +66,18 @@ spec:
         values: |
           webhooksCleanup:
             image:
-              registry: docker.io
-              repository: bitnami/kubectl
-              tag: 1.26.4
+              registry: registry.k8s.io
+              repository: kubectl
+              tag: v1.26.4
           features:
             policyExceptions:
               enabled: true
           cleanupJobs:
             admissionReports:
               image:
-                registry: docker.io
-                repository: bitnami/kubectl
-                tag: 1.26.4
+                registry: registry.k8s.io
+                repository: kubectl
+                tag: v1.26.4
               resources:
                 limits:
                   memory: 1G
@@ -87,9 +87,9 @@ spec:
                   cpu: 100m
             clusterAdmissionReports:
               image:
-                registry: docker.io
-                repository: bitnami/kubectl
-                tag: 1.26.4
+              registry: registry.k8s.io
+              repository: kubectl
+              tag: v1.26.4
               resources:
                 limits:
                   memory: 1G
@@ -99,9 +99,9 @@ spec:
                   cpu: 100m
             updateRequests:
               image:
-                registry: docker.io
-                repository: bitnami/kubectl
-                tag: 1.26.4
+              registry: registry.k8s.io
+              repository: kubectl
+              tag: v1.26.4
               resources:
                 limits:
                   memory: 1G
@@ -111,9 +111,9 @@ spec:
                   cpu: 100m
             ephemeralReports:
               image:
-                registry: docker.io
-                repository: bitnami/kubectl
-                tag: 1.26.4
+              registry: registry.k8s.io
+              repository: kubectl
+              tag: v1.26.4
               resources:
                 limits:
                   memory: 1G
@@ -123,9 +123,9 @@ spec:
                   cpu: 100m
             clusterEphemeralReports:
               image:
-                registry: docker.io
-                repository: bitnami/kubectl
-                tag: 1.26.4
+              registry: registry.k8s.io
+              repository: kubectl
+              tag: v1.26.4
               resources:
                 limits:
                   memory: 1G
