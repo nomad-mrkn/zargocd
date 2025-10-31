@@ -1,0 +1,98 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: k8s-spb2-backend1-dex-auth
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
+    syncOptions:
+    - FailOnSharedResource=false
+  project: k8s-spb2-backend1
+  destination:
+    name: k8s-spb2-backend1
+    namespace: kube-system
+  sources:
+    # JIT RBAC hooks (PreSync + PostSync)
+    - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+      targetRevision: HEAD
+      path: shared/jit-rbac
+      kustomize:
+        commonLabels:
+          jit-rbac/app: k8s-spb2-backend1-dex-auth
+        patches:
+          - target:
+              kind: ClusterRole
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: argocd-manager-dex-auth
+          - target:
+              kind: ClusterRoleBinding
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: argocd-manager-dex-auth
+              - op: replace
+                path: /roleRef/name
+                value: argocd-manager-dex-auth
+          - target:
+              kind: CronJob
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: k8s-spb2-backend1-dex-auth-cleanup-cron
+          - target:
+              kind: Job
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: k8s-spb2-backend1-dex-auth-cleanup
+    # JIT RBAC role definition
+    - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+      targetRevision: HEAD
+      path: shared/jit-rbac-roles
+      directory:
+        include: dex-auth-role.yaml
+    # Dex Auth Helm chart
+    - repoURL: 'https://artifactory.playteam.ru:443/artifactory/helm/'
+      targetRevision: 1.4.0-37R
+      chart: dex-k8s-authenticator
+      helm:
+        releaseName: dex-k8s-authenticator
+        valuesObject:
+          #Values
+          dexK8sAuthenticator:
+            clusters:
+            - name: k8s-spb2-backend1
+              short_description: "k8s-spb2-backend1"
+              description: "Example Cluster Long Description..."
+              client_secret: ${KEYCLOACK-SECRET}
+              issuer: "https://openid.okko.team/realms/Okko"
+              k8s_ca_pem_file: /etc/ca.crt
+              k8s_master_uri: "https://k8s-spb2-backend1-api.qq:8002"
+              client_id: k8s-spb2-backend1
+              redirect_uri: http://k8s-spb2-backend1-auth.qq/callback
+          ingress:
+            enabled: true
+            annotations:
+              kubernetes.io/ingress.class: haproxy
+            path: /
+            pathType: Prefix
+            hosts:
+              - "k8s-spb2-backend1-auth.qq"
+            tls: []
+          podEnv:
+            - name: KEYCLOACK-SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: keycloack-secret
+                  key: secret
+          vault:
+            - name: keycloack-secret
+              path: secret/internal/infrastructure/keycloak/k8s-spb2-backend1
+              type: Opaque
