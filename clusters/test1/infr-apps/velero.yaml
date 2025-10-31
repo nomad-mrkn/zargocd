@@ -12,8 +12,6 @@ spec:
     syncOptions:
     - FailOnSharedResource=false
     - CreateNamespace=true
-    - ServerSideApply=true
-    - Replace=true
   project: default
   destination:
     name: kind-test-1
@@ -95,7 +93,6 @@ spec:
           credentials:
             useSecret: false
           rbac:
-            create: false
             clusterAdministrator: false
           schedules:
             k8s-spb2-backend1:
