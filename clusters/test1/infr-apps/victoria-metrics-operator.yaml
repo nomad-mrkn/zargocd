@@ -73,6 +73,10 @@ spec:
             remoteWrite:
               - url: http://localhost:8428/api/v1/write
             shardCount: 1
+          metrics-server:
+            enabled: true
+            args:
+              - --kubelet-insecure-tls
           prometheus-node-exporter:
             enabled: true
             image:
