@@ -66,15 +66,15 @@ spec:
         values: |
           webhooksCleanup:
             image:
-              registry: registry.k8s.io
-              repository: kubectl
-              tag: v1.26.4
+              registry: docker.io
+              repository: alpine/k8s
+              tag: 1.26.4
           policyReportsCleanup:
             enabled: true
             image:
-              registry: registry.k8s.io
-              repository: kubectl
-              tag: v1.26.4
+              registry: docker.io
+              repository: alpine/k8s
+              tag: 1.26.4
           features:
             policyExceptions:
               enabled: true
