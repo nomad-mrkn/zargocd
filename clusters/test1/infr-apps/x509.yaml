@@ -66,6 +66,10 @@ spec:
             registry: docker.io
             repository: enix/x509-certificate-exporter
             tag: 3.6.0
+          prometheusServiceMonitor:
+            create: false
+          prometheusRules:
+            create: false
           secretsExporter:
             resources:
               requests:
