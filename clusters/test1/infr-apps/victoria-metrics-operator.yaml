@@ -68,12 +68,8 @@ spec:
           env:
             - name: VM_VMAGENTDEFAULT_CONFIGRELOADIMAGE
               value: quay.io/prometheus-operator/prometheus-config-reloader:v0.68.0
-                    metrics-server:
-            enabled: true
-            args:
-              - --kubelet-insecure-tls
-                    vmagent:
+          vmagent:
             enabled: true
             remoteWrite:
-              - url: http://localhost:8428/api/v1/write  # stub URL
+              - url: http://localhost:8428/api/v1/write
             shardCount: 1
