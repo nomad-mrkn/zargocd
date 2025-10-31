@@ -48,3 +48,13 @@ rules:
   - apiGroups: ["batch"]
     resources: ["jobs", "cronjobs"]
     verbs: ["create", "delete", "list", "get", "watch", "update"]
+
+  # VictoriaMetrics ServiceScrape for metrics
+  - apiGroups: ["operator.victoriametrics.com"]
+    resources: ["vmservicescrapes"]
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+
+  # Vault Secrets Operator CRs if used for credentials
+  - apiGroups: ["ricoberger.de"]
+    resources: ["vaultsecrets"]
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
