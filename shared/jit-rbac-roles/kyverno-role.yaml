@@ -3,7 +3,7 @@ kind: ClusterRole
 metadata:
   name: argocd-manager-kyverno
   annotations:
-    argocd.argoproj.io/sync-wave: "-5"
+    argocd.argoproj.io/sync-wave: "0"
     argocd.argoproj.io/sync-options: Prune=false
   labels:
     app.kubernetes.io/part-of: argo-jit-rbac
