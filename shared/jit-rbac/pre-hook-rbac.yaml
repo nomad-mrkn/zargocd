@@ -30,5 +30,3 @@ subjects:
   - kind: ServiceAccount
     name: argocd-manager
     namespace: kube-system
-
-

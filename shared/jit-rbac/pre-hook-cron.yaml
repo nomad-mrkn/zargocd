@@ -45,5 +45,3 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.labels['jit-rbac/app']
-
-
