@@ -58,3 +58,18 @@ rules:
   - apiGroups: ["ricoberger.de"]
     resources: ["vaultsecrets"]
     verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
+
+  # Velero CRDs
+  - apiGroups: ["velero.io"]
+    resources:
+      - backups
+      - restores
+      - backupstoragelocations
+      - volumesnapshotlocations
+      - schedules
+      - downloadrequests
+      - deletebackuprequests
+      - podvolumebackups
+      - podvolumerestores
+      - serverstatusrequests
+    verbs: ["create", "update", "patch", "get", "list", "watch", "delete"]
