@@ -62,6 +62,9 @@ spec:
       helm:
         releaseName: vector
         values: |
+          image:
+            repository: docker.io/timberio/vector
+            tag: 0.46.1-alpine
           resources:
             requests:
               cpu: 100m
