@@ -1,0 +1,103 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: k8s-spb2-backend1-vault
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  syncPolicy:
+    automated:
+      prune: false
+    syncOptions:
+    - CreateNamespace=true
+    - FailOnSharedResource=false
+  project: default
+  destination:
+    name: kind-test-1
+    namespace: vault-operator
+  sources:
+    - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+      targetRevision: HEAD
+      path: shared/jit-rbac
+      kustomize:
+        commonLabels:
+          jit-rbac/app: k8s-spb2-backend1-vault-operator
+        patches:
+          - target:
+              kind: ClusterRole
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: argocd-manager-vault-operator
+          - target:
+              kind: ClusterRoleBinding
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: argocd-manager-vault-operator
+              - op: replace
+                path: /roleRef/name
+                value: argocd-manager-vault-operator
+          - target:
+              kind: CronJob
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: k8s-spb2-backend1-vault-operator-cleanup-cron
+          - target:
+              kind: Job
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: k8s-spb2-backend1-vault-operator-cleanup
+    - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+      targetRevision: HEAD
+      path: shared/jit-rbac-roles
+      directory:
+        include: vault-operator-role.yaml
+    - repoURL: 'https://github.com/nomad-mrkn/charts.git'
+      targetRevision: HEAD
+      path: vault-secrets-operator
+      helm:
+        releaseName: vault-secrets-operator
+        values: |
+          image:
+            repository: ricoberger/vault-secrets-operator
+            tag: 1.16.5
+            pullPolicy: IfNotPresent
+          vault:
+            address: ""
+            authMethod: kubernetes
+            kubernetesPath: auth/kubernetes
+            kubernetesRole: vault-secrets-operator
+            reconciliationTime: 300
+          rbac:
+            create: true
+            createrole: true
+            namespaced: false
+          resources:
+            limits:
+              cpu: 1
+              memory: 1Gi
+          serviceMonitor:
+            enabled: false
+          vmServiceScrape:
+            enabled: true
+            labels: {}
+            interval: 60s
+            scrapeTimeout: 10s
+            honorLabels: true
+            relabelings: []
+          tolerations:
+            - key: "node-role.kubernetes.io/infr"
+              operator: "Exists"
+              effect: "NoSchedule"
+          affinity:
+            nodeAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 1
+                  preference:
+                    matchExpressions:
+                      - key: "node-role.kubernetes.io/infr"
+                        operator: "Exists"
