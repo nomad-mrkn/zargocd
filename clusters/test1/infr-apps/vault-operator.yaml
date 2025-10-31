@@ -66,16 +66,7 @@ spec:
             repository: ricoberger/vault-secrets-operator
             tag: 1.16.5
             pullPolicy: IfNotPresent
-          vault:
-            address: "http://vault.vault:8200"
-            authMethod: token
-            tokenPath: ""
-            reconciliationTime: 0
-          environmentVars:
-            - name: VAULT_TOKEN
-              value: "demo-token"
-            - name: VAULT_SKIP_VERIFY
-              value: "true"
+          replicaCount: 0
           rbac:
             create: true
             createrole: true
