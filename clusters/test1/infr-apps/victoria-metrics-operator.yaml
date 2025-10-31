@@ -73,3 +73,8 @@ spec:
             remoteWrite:
               - url: http://localhost:8428/api/v1/write
             shardCount: 1
+          prometheus-node-exporter:
+            enabled: true
+            image:
+              repository: docker.io/prom/node-exporter
+              tag: v1.4.0
