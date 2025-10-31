@@ -67,11 +67,15 @@ spec:
             tag: 1.16.5
             pullPolicy: IfNotPresent
           vault:
-            address: ""
-            authMethod: kubernetes
-            kubernetesPath: auth/kubernetes
-            kubernetesRole: vault-secrets-operator
-            reconciliationTime: 300
+            address: "http://vault.vault:8200"
+            authMethod: token
+            tokenPath: ""
+            reconciliationTime: 0
+          environmentVars:
+            - name: VAULT_TOKEN
+              value: "demo-token"
+            - name: VAULT_SKIP_VERIFY
+              value: "true"
           rbac:
             create: true
             createrole: true
