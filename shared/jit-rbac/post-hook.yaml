@@ -30,16 +30,36 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.labels['jit-rbac/app']
-        command: ["/bin/sh","-lc"]
+        command: ["/bin/sh", "-c"]
         args:
           - |
+            set -euo pipefail
+            echo "Starting PostSync cleanup for ${JIT_RBAC_APP} at $(date -u +%FT%TZ)";
             ROLE_NAME=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o jsonpath='{.items[0].roleRef.name}' 2>/dev/null || echo "");
-            kubectl delete clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --ignore-not-found=true;
-            if [ -n "$ROLE_NAME" ]; then
-              kubectl patch clusterrole "$ROLE_NAME" --type=merge -p '{"rules": []}' || echo "Patch failed";
-            else
-              echo "No ClusterRole found to clear";
+            
+            if [ -z "${ROLE_NAME}" ]; then
+              echo "No ClusterRoleBinding found for ${JIT_RBAC_APP}, skipping cleanup";
+              exit 0;
             fi
+
+            CRB_NAME=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "");
+            
+            if [ -n "${CRB_NAME}" ]; then
+              echo "Removing finalizers from ClusterRoleBinding: ${CRB_NAME}";
+              kubectl patch clusterrolebinding "${CRB_NAME}" --type=merge -p '{"metadata":{"finalizers":[]}}' --ignore-not-found=true || true;
+              
+              echo "Deleting ClusterRoleBinding: ${CRB_NAME}";
+              kubectl delete clusterrolebinding "${CRB_NAME}" --ignore-not-found=true || true;
+            fi
+            
+            echo "Clearing rules in ClusterRole: ${ROLE_NAME}";
+            kubectl patch clusterrole "${ROLE_NAME}" --type=merge -p '{"rules": []}' --ignore-not-found=true || echo "Warning: Failed to patch ClusterRole";
+            
             CRONJOB_NAME="${JIT_RBAC_APP}-cleanup-cron";
-            kubectl delete cronjob "$CRONJOB_NAME" --ignore-not-found=true;
+            echo "Deleting CronJob: ${CRONJOB_NAME}";
+            kubectl delete cronjob "${CRONJOB_NAME}" -n kube-system --ignore-not-found=true || true;
+            
+            echo "Cleaning up succeeded pods";
             kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
+            
+            echo "PostSync cleanup completed for ${JIT_RBAC_APP} at $(date -u +%FT%TZ)";
