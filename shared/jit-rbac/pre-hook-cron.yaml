@@ -36,8 +36,16 @@ spec:
             command: ["/bin/sh", "-c"]
             args:
               - |
+                set -euo pipefail
                 echo "Starting cleanup at $(date)";
                 CRB_EXISTS=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o name 2>/dev/null || echo "");
+                
+                if [ -z "${CRB_EXISTS}" ]; then
+                  echo "No ClusterRoleBinding found for ${JIT_RBAC_APP}, skipping pod cleanup";
+                  exit 0;
+                fi
+                
+                echo "ClusterRoleBinding exists, cleaning up succeeded pods";
                 kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
                 echo "Cleanup completed at $(date)";
             env:
