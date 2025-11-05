@@ -36,10 +36,12 @@ spec:
             command: ["/bin/sh", "-c"]
             args:
               - |
-                echo "Starting cleanup at $(date)";
-                CRB_EXISTS=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o name 2>/dev/null || echo "");
+                set -uo pipefail
+                echo "Starting cleanup at $(date -u +%FT%TZ)";
+                
                 kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
-                echo "Cleanup completed at $(date)";
+                
+                echo "Cleanup completed at $(date -u +%FT%TZ)";
             env:
             - name: JIT_RBAC_APP
               valueFrom:
