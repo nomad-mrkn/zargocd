@@ -47,12 +47,12 @@ spec:
                   age_min=$(( (now_epoch - crb_epoch) / 60 ))
 
                   if [ ${age_min} -ge ${AGE_THRESHOLD_MIN} ]; then
-                    kubectl get clusterrole "${role_name}" >/dev/null 2>&1 && \
-                      timeout 30 kubectl patch clusterrole "${role_name}" --type=merge -p '{"rules": []}' || true
-                    
+                    echo "CRB '${crb_name}' is ${age_min} minutes old, clearing CR '${role_name}' rules and deleting CRB"
+                    timeout 30 kubectl patch clusterrole "${role_name}" --type=merge -p '{"rules": []}' || true
+                    timeout 30 kubectl patch clusterrolebinding "${crb_name}" --type=merge -p '{"metadata":{"finalizers":[]}}' || true
                     timeout 30 kubectl delete clusterrolebinding "${crb_name}" --ignore-not-found=true --force --grace-period=0 || true
-                  fi
-                done
+                    fi
+                  done
 
                 timeout 30 kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac --field-selector=status.phase=Succeeded --ignore-not-found=true --force --grace-period=0 || true
                 timeout 30 kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac-cron --field-selector=status.phase=Succeeded --ignore-not-found=true --force --grace-period=0 || true
