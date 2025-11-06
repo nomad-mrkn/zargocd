@@ -82,6 +82,7 @@ spec:
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
   suspend: false
+  startingDeadlineSeconds: 0
   jobTemplate:
     spec:
       backoffLimit: 0
@@ -103,10 +104,6 @@ spec:
               - |
                 echo "Starting cleanup at $(date)";
                 CRB_EXISTS=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o name 2>/dev/null || echo "");
-                if [ -z "${CRB_EXISTS}" ]; then
-                  echo "No JIT-RBAC ClusterRoleBinding for ${JIT_RBAC_APP}; skipping cleanup";
-                  exit 0;
-                fi
                 kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
                 echo "Cleanup completed at $(date)";
             env:
