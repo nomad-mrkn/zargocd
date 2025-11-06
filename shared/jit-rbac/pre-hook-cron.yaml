@@ -51,6 +51,14 @@ spec:
                   
                   if [ "${crb_epoch}" != "0" ]; then
                     age_min=$(( (now_epoch - crb_epoch) / 60 ))
+                    if [ ${age_min} -lt ${AGE_THRESHOLD_MIN} ]; then
+                      echo "ClusterRoleBinding '${crb_name}' is only ${age_min} minute(s) old, skipping cleanup (threshold: ${AGE_THRESHOLD_MIN} min)";
+                      exit 0;
+                    fi
+                  fi
+                else
+                  echo "No ClusterRoleBinding found for ${JIT_RBAC_APP}, proceeding with safe pod cleanup only";
+                fi
                 
                 timeout 30 kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} \
                   --field-selector=status.phase=Succeeded --ignore-not-found=true --force --grace-period=0 || true;
