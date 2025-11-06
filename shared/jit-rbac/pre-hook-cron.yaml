@@ -16,7 +16,7 @@ spec:
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
   suspend: true
-  startingDeadlineSeconds: 11
+  startingDeadlineSeconds: 300
   jobTemplate:
     spec:
       backoffLimit: 0
@@ -36,10 +36,28 @@ spec:
             command: ["/bin/sh", "-c"]
             args:
               - |
+                set -euo pipefail
                 echo "Starting cleanup at $(date)";
-                CRB_EXISTS=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o name 2>/dev/null || echo "");
-                if [ -z "${CRB_EXISTS}" ]; then
+                CRB_NAME=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "");
+                if [ -z "${CRB_NAME}" ]; then
                   echo "No JIT-RBAC ClusterRoleBinding for ${JIT_RBAC_APP}; skipping cleanup";
+                  exit 0;
+                fi
+                AGE_THRESHOLD_MIN=${AGE_THRESHOLD_MIN:-15}
+                CRB_CT=$(kubectl get clusterrolebinding "${CRB_NAME}" -o jsonpath='{.metadata.creationTimestamp}' 2>/dev/null || echo "");
+                if [ -z "${CRB_CT}" ]; then
+                  echo "Cannot determine CRB creation time; skipping cleanup";
+                  exit 0;
+                fi
+                now_epoch=$(date -u +%s)
+                crb_epoch=$(date -u -d "${CRB_CT}" +%s 2>/dev/null || echo 0)
+                if [ "${crb_epoch}" = "0" ]; then
+                  echo "Failed to parse CRB creation time; skipping cleanup";
+                  exit 0;
+                fi
+                age_min=$(( (now_epoch - crb_epoch) / 60 ))
+                if [ ${age_min} -lt ${AGE_THRESHOLD_MIN} ]; then
+                  echo "CRB '${CRB_NAME}' age ${age_min}m < threshold ${AGE_THRESHOLD_MIN}m; skipping cleanup";
                   exit 0;
                 fi
                 kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
