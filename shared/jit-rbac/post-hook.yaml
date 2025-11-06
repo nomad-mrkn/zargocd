@@ -30,45 +30,47 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.labels['jit-rbac/app']
-        command: ["/bin/sh", "-c"]
+        command: ["/bin/bash", "-c"]
         args:
           - |
-            set -uo pipefail
-            echo "Starting PostSync cleanup for ${JIT_RBAC_APP} at $(date -u +%FT%TZ)";
+            set -euo pipefail
+            echo "Starting PostSync cleanup for ${JIT_RBAC_APP} at $(date -u +%FT%TZ)"
             
-            CRB_NAME=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "");
-            ROLE_NAME=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o jsonpath='{.items[0].roleRef.name}' 2>/dev/null || echo "");
+            CRB_NAME=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "")
+            ROLE_NAME=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o jsonpath='{.items[0].roleRef.name}' 2>/dev/null || echo "")
             
             if [ -z "${ROLE_NAME}" ]; then
-              ROLE_NAME=$(kubectl get clusterrole -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "");
+              ROLE_NAME=$(kubectl get clusterrole -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "")
               if [ -z "${ROLE_NAME}" ]; then
-                echo "No ClusterRole or ClusterRoleBinding found for ${JIT_RBAC_APP}, skipping cleanup";
-                exit 0;
+                echo "No ClusterRole or ClusterRoleBinding found for ${JIT_RBAC_APP}, skipping cleanup"
+                exit 0
               fi
             fi
             
             if [ -n "${CRB_NAME}" ]; then
-              kubectl patch clusterrolebinding "${CRB_NAME}" --type=merge -p '{"metadata":{"finalizers":[]}}' --ignore-not-found=true || true;
-              
-              kubectl delete clusterrolebinding "${CRB_NAME}" --ignore-not-found=true || true;
+              echo "Removing finalizers from ClusterRoleBinding: ${CRB_NAME}"
+              kubectl patch clusterrolebinding "${CRB_NAME}" --type=merge -p '{"metadata":{"finalizers":[]}}' --ignore-not-found=true || true
+              echo "Deleting ClusterRoleBinding: ${CRB_NAME}"
+              kubectl delete clusterrolebinding "${CRB_NAME}" --ignore-not-found=true || true
             fi
             
             if [ -n "${ROLE_NAME}" ]; then
+              echo "Clearing rules in ClusterRole: ${ROLE_NAME}"
               if kubectl patch clusterrole "${ROLE_NAME}" --type=merge -p '{"rules": []}' 2>&1; then
-                echo "Successfully cleared rules in ClusterRole: ${ROLE_NAME}";
+                echo "Successfully cleared rules in ClusterRole: ${ROLE_NAME}"
               else
-                RULES_CHECK=$(kubectl get clusterrole "${ROLE_NAME}" -o jsonpath='{.rules}' 2>/dev/null || echo "[]");
+                RULES_CHECK=$(kubectl get clusterrole "${ROLE_NAME}" -o jsonpath='{.rules}' 2>/dev/null || echo "[]")
                 if [ "${RULES_CHECK}" != "[]" ]; then
-                  kubectl patch clusterrole "${ROLE_NAME}" --type=json -p '[{"op": "replace", "path": "/rules", "value": []}]' 2>&1 || true;
+                  kubectl patch clusterrole "${ROLE_NAME}" --type=json -p '[{"op": "replace", "path": "/rules", "value": []}]' 2>&1 || true
                 fi
               fi
             fi
             
-            CRONJOB_NAME="${JIT_RBAC_APP}-cleanup-cron";
-            echo "Deleting CronJob: ${CRONJOB_NAME}";
-            kubectl delete cronjob "${CRONJOB_NAME}" -n kube-system --ignore-not-found=true || true;
+            CRONJOB_NAME="${JIT_RBAC_APP}-cleanup-cron"
+            echo "Deleting CronJob: ${CRONJOB_NAME}"
+            kubectl delete cronjob "${CRONJOB_NAME}" -n kube-system --ignore-not-found=true || true
             
-            echo "Cleaning up succeeded pods";
-            kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
+            echo "Cleaning up succeeded pods"
+            kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true
             
-            echo "PostSync cleanup completed for ${JIT_RBAC_APP} at $(date -u +%FT%TZ)";
+            echo "PostSync cleanup completed for ${JIT_RBAC_APP} at $(date -u +%FT%TZ)"

@@ -82,7 +82,6 @@ spec:
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
   suspend: false
-  startingDeadlineSeconds: 0
   jobTemplate:
     spec:
       backoffLimit: 0
@@ -99,13 +98,14 @@ spec:
           - name: cleanup
             image: bitnami/kubectl:latest
             imagePullPolicy: IfNotPresent
-            command: ["/bin/sh", "-c"]
+            command: ["/bin/bash", "-c"]
             args:
               - |
-                echo "Starting cleanup at $(date)";
-                CRB_EXISTS=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o name 2>/dev/null || echo "");
-                kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
-                echo "Cleanup completed at $(date)";
+                set -euo pipefail
+                echo "Starting cleanup at $(date -u +%FT%TZ)"
+                echo "Cleaning up succeeded pods for app: ${JIT_RBAC_APP}"
+                kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true
+                echo "Cleanup completed at $(date -u +%FT%TZ)"
             env:
             - name: JIT_RBAC_APP
               valueFrom:
