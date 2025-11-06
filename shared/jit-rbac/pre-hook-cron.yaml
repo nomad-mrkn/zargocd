@@ -36,34 +36,14 @@ spec:
             command: ["/bin/sh", "-c"]
             args:
               - |
-                set -euo pipefail
-                echo "Starting per-app cleanup for ${JIT_RBAC_APP} at $(date -u +%FT%TZ)";
-                
-                AGE_THRESHOLD_MIN=${AGE_THRESHOLD_MIN:-3}
-                now_epoch=$(date -u +%s)
-                
-                CRB_INFO=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} \
-                  -o jsonpath='{.items[0].metadata.name}{"\t"}{.items[0].metadata.creationTimestamp}{"\n"}' 2>/dev/null || echo "");
-                
-                if [ -n "${CRB_INFO}" ]; then
-                  IFS=$'\t' read -r crb_name crb_ct <<< "${CRB_INFO}"
-                  crb_epoch=$(date -u -d "${crb_ct}" +%s 2>/dev/null || echo 0)
-                  
-                  if [ "${crb_epoch}" != "0" ]; then
-                    age_min=$(( (now_epoch - crb_epoch) / 60 ))
-                    if [ ${age_min} -lt ${AGE_THRESHOLD_MIN} ]; then
-                      echo "ClusterRoleBinding '${crb_name}' is only ${age_min} minute(s) old, skipping cleanup (threshold: ${AGE_THRESHOLD_MIN} min)";
-                      exit 0;
-                    fi
-                  fi
-                else
-                  echo "No ClusterRoleBinding found for ${JIT_RBAC_APP}, proceeding with safe pod cleanup only";
+                echo "Starting cleanup at $(date)";
+                CRB_EXISTS=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o name 2>/dev/null || echo "");
+                if [ -z "${CRB_EXISTS}" ]; then
+                  echo "No JIT-RBAC ClusterRoleBinding for ${JIT_RBAC_APP}; skipping cleanup";
+                  exit 0;
                 fi
-                
-                timeout 30 kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} \
-                  --field-selector=status.phase=Succeeded --ignore-not-found=true --force --grace-period=0 || true;
-                
-                echo "Per-app cleanup completed for ${JIT_RBAC_APP} at $(date -u +%FT%TZ)";
+                kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
+                echo "Cleanup completed at $(date)";
             env:
             - name: JIT_RBAC_APP
               valueFrom:
