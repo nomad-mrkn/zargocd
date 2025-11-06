@@ -1,0 +1,92 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: APP_NAME_PLACEHOLDER-verify-rbac
+  namespace: kube-system
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    argocd.argoproj.io/sync-wave: "1"
+  labels:
+    app.kubernetes.io/part-of: argo-jit-rbac
+    jit-rbac/app: APP_NAME_PLACEHOLDER
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 60
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/part-of: argo-jit-rbac
+        jit-rbac/app: APP_NAME_PLACEHOLDER
+    spec:
+      serviceAccountName: argocd-manager
+      restartPolicy: Never
+      containers:
+      - name: verify
+        image: bitnami/kubectl:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: JIT_RBAC_APP
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['jit-rbac/app']
+        - name: ROLE_NAME
+          value: ROLE_NAME_PLACEHOLDER
+        - name: MAX_RETRIES
+          value: "30"
+        - name: RETRY_DELAY
+          value: "2"
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            set -euo pipefail
+            echo "Verifying RBAC setup for ${JIT_RBAC_APP} at $(date -u +%FT%TZ)"
+            
+            retry=0
+            while [ ${retry} -lt ${MAX_RETRIES} ]; do
+              echo "Attempt $((retry + 1))/${MAX_RETRIES}: Checking ClusterRole ${ROLE_NAME}"
+              
+              # Проверка существования ClusterRole
+              if ! kubectl get clusterrole "${ROLE_NAME}" >/dev/null 2>&1; then
+                echo "ERROR: ClusterRole ${ROLE_NAME} not found"
+                retry=$((retry + 1))
+                sleep ${RETRY_DELAY}
+                continue
+              fi
+              
+              # Проверка, что роль НЕ пустая
+              RULES_COUNT=$(kubectl get clusterrole "${ROLE_NAME}" -o jsonpath='{.rules}' | jq '. | length' 2>/dev/null || echo "0")
+              if [ "${RULES_COUNT}" = "0" ] || [ -z "${RULES_COUNT}" ]; then
+                echo "WARN: ClusterRole ${ROLE_NAME} has no rules yet (rules count: ${RULES_COUNT})"
+                retry=$((retry + 1))
+                sleep ${RETRY_DELAY}
+                continue
+              fi
+              
+              # Проверка существования ClusterRoleBinding
+              if ! kubectl get clusterrolebinding "${ROLE_NAME}" >/dev/null 2>&1; then
+                echo "ERROR: ClusterRoleBinding ${ROLE_NAME} not found"
+                retry=$((retry + 1))
+                sleep ${RETRY_DELAY}
+                continue
+              fi
+              
+              # Проверка, что CRB связан с правильной ролью
+              BOUND_ROLE=$(kubectl get clusterrolebinding "${ROLE_NAME}" -o jsonpath='{.roleRef.name}' 2>/dev/null || echo "")
+              if [ "${BOUND_ROLE}" != "${ROLE_NAME}" ]; then
+                echo "ERROR: ClusterRoleBinding ${ROLE_NAME} bound to wrong role: ${BOUND_ROLE}"
+                retry=$((retry + 1))
+                sleep ${RETRY_DELAY}
+                continue
+              fi
+              
+              # Все проверки пройдены
+              echo "SUCCESS: RBAC verified at $(date -u +%FT%TZ)"
+              echo "  - ClusterRole: ${ROLE_NAME} (${RULES_COUNT} rules)"
+              echo "  - ClusterRoleBinding: ${ROLE_NAME} → SA argocd-manager"
+              exit 0
+            done
+            
+            echo "FAILURE: RBAC verification failed after ${MAX_RETRIES} attempts"
+            exit 1
+

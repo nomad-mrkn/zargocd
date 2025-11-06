@@ -47,6 +47,17 @@ spec:
                 value: argocd-manager-certmanager
           - target:
               kind: Job
+              name: APP_NAME_PLACEHOLDER-verify-rbac
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: k8s-spb2-backend3-certmanager-verify-rbac
+              - op: replace
+                path: /spec/template/spec/containers/0/env/1/value
+                value: argocd-manager-certmanager
+          - target:
+              kind: Job
+              name: APP_NAME_PLACEHOLDER-cleanup
             patch: |-
               - op: replace
                 path: /metadata/name

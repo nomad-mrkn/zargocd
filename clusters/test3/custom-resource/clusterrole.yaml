@@ -38,6 +38,7 @@ rules:
     - vaultsecrets
     - configmaps
     - endpoints
+    - serviceaccounts
     - services
     - backupstoragelocations
     - schedules
@@ -48,8 +49,8 @@ rules:
     - csistoragecapacities
     verbs: ["get", "list", "watch"]
   - apiGroups: [""]
-    resources: ["events", "serviceaccounts"]
-    verbs: ["create", "list", "watch", "get"]
+    resources: ["events"]
+    verbs: ["create", "list"]
   - apiGroups: [""]
     resources: ["namespaces"]
     verbs: ["create", "get", "list", "watch", "patch"]
