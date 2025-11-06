@@ -30,6 +30,12 @@ spec:
               - op: replace
                 path: /metadata/name
                 value: k8s-spb2-backend1-certmanager-cleanup-cron
+              - op: replace
+                path: /spec/jobTemplate/spec/template/spec/containers/0/env/0/value
+                value: k8s-spb2-backend1-certmanager
+              - op: replace
+                path: /spec/jobTemplate/spec/template/spec/containers/0/env/1/value
+                value: k8s-spb2-backend1-certmanager-cleanup-cron
           - target:
               kind: ClusterRole
             patch: |-
