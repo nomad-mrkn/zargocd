@@ -35,7 +35,7 @@ spec:
             patch: |-
               - op: replace
                 path: /metadata/name
-                value: argocd-manager-certmanager
+                value: argocd-manager-certmanager-install
               - op: replace
                 path: /roleRef/name
                 value: argocd-manager-certmanager
@@ -47,6 +47,7 @@ spec:
                 value: k8s-spb2-backend1-certmanager-cleanup-cron
           - target:
               kind: Job
+              labelSelector: jit-rbac/app
             patch: |-
               - op: replace
                 path: /metadata/name
