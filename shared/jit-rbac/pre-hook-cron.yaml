@@ -36,10 +36,35 @@ spec:
             command: ["/bin/sh", "-c"]
             args:
               - |
-                echo "Starting cleanup at $(date)";
-                CRB_EXISTS=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o name 2>/dev/null || echo "");
+                set -euo pipefail
+                echo "Starting cleanup at $(date -u +%FT%TZ)";
+                
+                MIN_AGE_MINUTES=${MIN_AGE_MINUTES:-5}
+                now_epoch=$(date -u +%s)
+                
+                CRB_INFO=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} \
+                  -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.metadata.creationTimestamp}{"\n"}{end}' 2>/dev/null | head -1 || echo "");
+                
+                if [ -n "${CRB_INFO}" ]; then
+                  IFS=$'\t' read -r crb_name crb_ct <<< "${CRB_INFO}"
+                  
+                  if [ -n "${crb_ct}" ]; then
+                    crb_epoch=$(date -u -d "${crb_ct}" +%s 2>/dev/null || echo 0)
+                    
+                    if [ "${crb_epoch}" != "0" ]; then
+                      age_min=$(( (now_epoch - crb_epoch) / 60 ))
+                      
+                      if [ ${age_min} -lt ${MIN_AGE_MINUTES} ]; then
+                        echo "ClusterRoleBinding '${crb_name}' is only ${age_min} minutes old (threshold: ${MIN_AGE_MINUTES} min), skipping cleanup to avoid interrupting active sync";
+                        exit 0;
+                      fi
+                    fi
+                  fi
+                fi
+
                 kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
-                echo "Cleanup completed at $(date)";
+                
+                echo "Cleanup completed at $(date -u +%FT%TZ)";
             env:
             - name: JIT_RBAC_APP
               valueFrom:
