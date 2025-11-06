@@ -34,20 +34,20 @@ spec:
             set -uo pipefail
             JIT_RBAC_APP="${JIT_RBAC_APP:-}"
             if [ -z "${JIT_RBAC_APP}" ] || [ "${JIT_RBAC_APP}" = "APP_NAME_PLACEHOLDER" ]; then
-              JOB_NAME="${JOB_NAME:-}"
-              if [ -z "${JOB_NAME}" ]; then
-                JOB_NAME=$(hostname 2>/dev/null || echo "")
+              POD_NAME="${HOSTNAME:-}"
+              if [ -z "${POD_NAME}" ]; then
+                POD_NAME=$(hostname 2>/dev/null || echo "")
               fi
-              if [ -n "${JOB_NAME}" ]; then
-                JIT_RBAC_APP=$(kubectl get job -n kube-system "${JOB_NAME}" -o jsonpath='{.metadata.labels.jit-rbac\/app}' 2>/dev/null || echo "")
-              fi
-            fi
-            if [ -z "${JIT_RBAC_APP}" ] || [ "${JIT_RBAC_APP}" = "APP_NAME_PLACEHOLDER" ]; then
-              echo "ERROR: JIT_RBAC_APP is not set and cannot be determined from Job labels";
-              echo "Attempting to get from pod labels...";
-              POD_NAME=$(hostname 2>/dev/null || echo "")
               if [ -n "${POD_NAME}" ]; then
+                echo "Attempting to get JIT_RBAC_APP from pod ${POD_NAME} labels...";
                 JIT_RBAC_APP=$(kubectl get pod -n kube-system "${POD_NAME}" -o jsonpath='{.metadata.labels.jit-rbac\/app}' 2>/dev/null || echo "")
+                if [ -z "${JIT_RBAC_APP}" ]; then
+                  JOB_NAME=$(kubectl get pod -n kube-system "${POD_NAME}" -o jsonpath='{.metadata.ownerReferences[?(@.kind=="Job")].name}' 2>/dev/null || echo "")
+                  if [ -n "${JOB_NAME}" ]; then
+                    echo "Attempting to get JIT_RBAC_APP from job ${JOB_NAME} labels...";
+                    JIT_RBAC_APP=$(kubectl get job -n kube-system "${JOB_NAME}" -o jsonpath='{.metadata.labels.jit-rbac\/app}' 2>/dev/null || echo "")
+                  fi
+                fi
               fi
             fi
             if [ -z "${JIT_RBAC_APP}" ] || [ "${JIT_RBAC_APP}" = "APP_NAME_PLACEHOLDER" ]; then
