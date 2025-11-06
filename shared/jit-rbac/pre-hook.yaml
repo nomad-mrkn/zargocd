@@ -9,6 +9,7 @@ metadata:
     argocd.argoproj.io/sync-wave: "-4"
   labels:
     app.kubernetes.io/part-of: argo-jit-rbac
+    jit-rbac/global-cleanup: "true"
 spec:
   backoffLimit: 0
   ttlSecondsAfterFinished: 60
