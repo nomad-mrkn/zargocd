@@ -33,7 +33,7 @@ spec:
         command: ["/bin/sh", "-c"]
         args:
           - |
-            set -uo pipefail
+            set -euo pipefail
             echo "Starting PostSync cleanup for ${JIT_RBAC_APP} at $(date -u +%FT%TZ)";
             
             CRB_NAME=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "");
