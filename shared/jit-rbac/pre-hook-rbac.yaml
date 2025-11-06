@@ -14,7 +14,7 @@ rules: []
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: ROLE_NAME_PLACEHOLDER
+  name: ROLE_NAME_PLACEHOLDER-install
   annotations:
     argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/hook-delete-policy: HookFailed
