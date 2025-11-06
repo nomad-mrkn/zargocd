@@ -41,14 +41,14 @@ spec:
                   [ "${crb_name}" = "${WATCHER}" ] && continue
 
                   crb_epoch=$(date -u -d "${crb_ct}" +%s 2>/dev/null || echo 0)
-                  [ "${crb_epoch}" = "0" ] && continue
+                    [ "${crb_epoch}" = "0" ] && continue
 
-                  age_min=$(( (now_epoch - crb_epoch) / 60 ))
+                    age_min=$(( (now_epoch - crb_epoch) / 60 ))
 
-                  if [ ${age_min} -ge ${AGE_THRESHOLD_MIN} ]; then
+                    if [ ${age_min} -ge ${AGE_THRESHOLD_MIN} ]; then
                     echo "CRB '${crb_name}' is ${age_min} minutes old, deleting..."
-                    timeout 30 kubectl patch clusterrolebinding "${crb_name}" --type=merge -p '{"metadata":{"finalizers":[]}}' || true
-                    timeout 30 kubectl delete clusterrolebinding "${crb_name}" --ignore-not-found=true --force --grace-period=0 || true
+                      timeout 30 kubectl patch clusterrolebinding "${crb_name}" --type=merge -p '{"metadata":{"finalizers":[]}}' || true
+                      timeout 30 kubectl delete clusterrolebinding "${crb_name}" --ignore-not-found=true --force --grace-period=0 || true
                     echo "Deleted CRB '${crb_name}'"
                   fi
                 done
