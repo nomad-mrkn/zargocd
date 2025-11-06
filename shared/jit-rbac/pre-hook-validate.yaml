@@ -1,0 +1,94 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: APP_NAME_PLACEHOLDER-validate-rbac
+  namespace: kube-system
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    argocd.argoproj.io/sync-wave: "1"
+  labels:
+    app.kubernetes.io/part-of: argo-jit-rbac
+    jit-rbac/app: APP_NAME_PLACEHOLDER
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/part-of: argo-jit-rbac
+        jit-rbac/app: APP_NAME_PLACEHOLDER
+    spec:
+      serviceAccountName: argocd-manager
+      restartPolicy: OnFailure
+      containers:
+      - name: validate
+        image: bitnami/kubectl:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: JIT_RBAC_APP
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['jit-rbac/app']
+        - name: TIMEOUT_SECONDS
+          value: "60"
+        - name: CHECK_INTERVAL
+          value: "2"
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            set -euo pipefail
+            echo "[$(date -u +%FT%TZ)] Starting RBAC validation for ${JIT_RBAC_APP}"
+            
+            # Найти имя ClusterRole по label
+            ROLE_NAME=""
+            elapsed=0
+            
+            while [ ${elapsed} -lt ${TIMEOUT_SECONDS} ]; do
+              ROLE_NAME=$(kubectl get clusterrole -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "")
+              
+              if [ -n "${ROLE_NAME}" ]; then
+                echo "[$(date -u +%FT%TZ)] Found ClusterRole: ${ROLE_NAME}"
+                break
+              fi
+              
+              echo "[$(date -u +%FT%TZ)] Waiting for ClusterRole to be created... (${elapsed}s/${TIMEOUT_SECONDS}s)"
+              sleep ${CHECK_INTERVAL}
+              elapsed=$((elapsed + CHECK_INTERVAL))
+            done
+            
+            if [ -z "${ROLE_NAME}" ]; then
+              echo "[$(date -u +%FT%TZ)] ERROR: ClusterRole not found after ${TIMEOUT_SECONDS}s"
+              exit 1
+            fi
+            
+            # Проверить, что роль заполнена правилами
+            elapsed=0
+            while [ ${elapsed} -lt ${TIMEOUT_SECONDS} ]; do
+              RULES_JSON=$(kubectl get clusterrole "${ROLE_NAME}" -o jsonpath='{.rules}' 2>/dev/null || echo "[]")
+              RULES_COUNT=$(echo "${RULES_JSON}" | grep -o '"apiGroups"' | wc -l | tr -d ' ')
+              
+              if [ "${RULES_JSON}" != "[]" ] && [ "${RULES_JSON}" != "" ] && [ "${RULES_COUNT}" -gt 0 ]; then
+                echo "[$(date -u +%FT%TZ)] SUCCESS: ClusterRole '${ROLE_NAME}' has ${RULES_COUNT} rule(s)"
+                
+                # Проверить ClusterRoleBinding
+                CRB_NAME=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "")
+                if [ -n "${CRB_NAME}" ]; then
+                  echo "[$(date -u +%FT%TZ)] ClusterRoleBinding '${CRB_NAME}' is active"
+                else
+                  echo "[$(date -u +%FT%TZ)] WARNING: ClusterRoleBinding not found"
+                fi
+                
+                echo "[$(date -u +%FT%TZ)] RBAC validation passed. Ready for Helm deployment."
+                exit 0
+              fi
+              
+              echo "[$(date -u +%FT%TZ)] Waiting for ClusterRole rules to be populated... (${elapsed}s/${TIMEOUT_SECONDS}s)"
+              sleep ${CHECK_INTERVAL}
+              elapsed=$((elapsed + CHECK_INTERVAL))
+            done
+            
+            echo "[$(date -u +%FT%TZ)] ERROR: ClusterRole '${ROLE_NAME}' rules not populated after ${TIMEOUT_SECONDS}s"
+            echo "[$(date -u +%FT%TZ)] Current rules: ${RULES_JSON}"
+            exit 1
+
