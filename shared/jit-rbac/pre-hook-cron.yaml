@@ -16,7 +16,7 @@ spec:
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
   suspend: false
-  startingDeadlineSeconds: 0
+#  startingDeadlineSeconds: 0
   jobTemplate:
     spec:
       backoffLimit: 0
