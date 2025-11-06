@@ -33,36 +33,27 @@ spec:
         command: ["/bin/sh", "-c"]
         args:
           - |
-            set -uo pipefail
+            set -euo pipefail
             echo "Starting PostSync cleanup for ${JIT_RBAC_APP} at $(date -u +%FT%TZ)";
-            
-            CRB_NAME=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "");
             ROLE_NAME=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o jsonpath='{.items[0].roleRef.name}' 2>/dev/null || echo "");
             
             if [ -z "${ROLE_NAME}" ]; then
-              ROLE_NAME=$(kubectl get clusterrole -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "");
-              if [ -z "${ROLE_NAME}" ]; then
-                echo "No ClusterRole or ClusterRoleBinding found for ${JIT_RBAC_APP}, skipping cleanup";
-                exit 0;
-              fi
+              echo "No ClusterRoleBinding found for ${JIT_RBAC_APP}, skipping cleanup";
+              exit 0;
             fi
+
+            CRB_NAME=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "");
             
             if [ -n "${CRB_NAME}" ]; then
+              echo "Removing finalizers from ClusterRoleBinding: ${CRB_NAME}";
               kubectl patch clusterrolebinding "${CRB_NAME}" --type=merge -p '{"metadata":{"finalizers":[]}}' --ignore-not-found=true || true;
               
+              echo "Deleting ClusterRoleBinding: ${CRB_NAME}";
               kubectl delete clusterrolebinding "${CRB_NAME}" --ignore-not-found=true || true;
             fi
             
-            if [ -n "${ROLE_NAME}" ]; then
-              if kubectl patch clusterrole "${ROLE_NAME}" --type=merge -p '{"rules": []}' 2>&1; then
-                echo "Successfully cleared rules in ClusterRole: ${ROLE_NAME}";
-              else
-                RULES_CHECK=$(kubectl get clusterrole "${ROLE_NAME}" -o jsonpath='{.rules}' 2>/dev/null || echo "[]");
-                if [ "${RULES_CHECK}" != "[]" ]; then
-                  kubectl patch clusterrole "${ROLE_NAME}" --type=json -p '[{"op": "replace", "path": "/rules", "value": []}]' 2>&1 || true;
-                fi
-              fi
-            fi
+            echo "Clearing rules in ClusterRole: ${ROLE_NAME}";
+            kubectl patch clusterrole "${ROLE_NAME}" --type=merge -p '{"rules": []}' --ignore-not-found=true || echo "Warning: Failed to patch ClusterRole";
             
             CRONJOB_NAME="${JIT_RBAC_APP}-cleanup-cron";
             echo "Deleting CronJob: ${CRONJOB_NAME}";
