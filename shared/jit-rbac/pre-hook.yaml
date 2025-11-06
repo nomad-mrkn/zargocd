@@ -1,40 +1,40 @@
-# apiVersion: batch/v1
-# kind: Job
-# metadata:
-#   name: argocd-cleanup-old-global-resources
-#   namespace: kube-system
-#   annotations:
-#     argocd.argoproj.io/hook: PreSync
-#     argocd.argoproj.io/hook-delete-policy: HookSucceeded,HookFailed
-#     argocd.argoproj.io/sync-wave: "-3"
-#   labels:
-#     app.kubernetes.io/part-of: argo-jit-rbac
-#     jit-rbac/type: global-cleanup
-# spec:
-#   backoffLimit: 0
-#   ttlSecondsAfterFinished: 60
-#   template:
-#     metadata:
-#       labels:
-#         app.kubernetes.io/part-of: argo-jit-rbac
-#         jit-rbac/type: global-cleanup
-#     spec:
-#       serviceAccountName: argocd-manager
-#       restartPolicy: Never
-#       containers:
-#       - name: cleanup-old-resources
-#         image: bitnami/kubectl:latest
-#         imagePullPolicy: IfNotPresent
-#         command: ["/bin/sh", "-c"]
-#         args:
-#           - |
-#             set -euo pipefail
-#             echo "Starting cleanup of old global resources at $(date -u +%FT%TZ)"
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: APP_NAME_PLACEHOLDER-cleanup-old-rbac
+  namespace: kube-system
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded,HookFailed
+    argocd.argoproj.io/sync-wave: "-3"
+  labels:
+    app.kubernetes.io/part-of: argo-jit-rbac
+    jit-rbac/app: APP_NAME_PLACEHOLDER
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 60
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/part-of: argo-jit-rbac
+        jit-rbac/app: APP_NAME_PLACEHOLDER
+    spec:
+      serviceAccountName: argocd-manager
+      restartPolicy: Never
+      containers:
+      - name: cleanup-old-rbac
+        image: bitnami/kubectl:latest
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            set -u
+            echo "Cleaning up old RBAC resources at $(date -u +%FT%TZ)"
             
-#             kubectl delete clusterrolebinding argocd-manager-role-binding --ignore-not-found=true || true
-#             kubectl delete clusterrole argocd-manager-role --ignore-not-found=true || true
+            kubectl delete clusterrolebinding argocd-manager-role-binding --ignore-not-found=true || true
+            kubectl delete clusterrole argocd-manager-role --ignore-not-found=true || true
             
-#             echo "Old global resources cleanup completed at $(date -u +%FT%TZ)"
+            echo "Old RBAC cleanup completed at $(date -u +%FT%TZ)"
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
