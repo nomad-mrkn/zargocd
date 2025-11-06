@@ -26,7 +26,6 @@ spec:
         patches:
           - target:
               kind: ClusterRole
-              annotationSelector: argocd.argoproj.io/hook=PreSync
             patch: |-
               - op: replace
                 path: /metadata/name
