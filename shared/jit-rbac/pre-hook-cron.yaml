@@ -4,7 +4,9 @@ metadata:
   name: APP_NAME_PLACEHOLDER-cleanup-cron
   namespace: kube-system
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookFailed
+    argocd.argoproj.io/sync-wave: "-2"
   labels:
     app.kubernetes.io/part-of: argo-jit-rbac
     jit-rbac/app: APP_NAME_PLACEHOLDER
@@ -34,23 +36,12 @@ spec:
             command: ["/bin/sh", "-c"]
             args:
               - |
-                set -uo pipefail
-                JIT_RBAC_APP="${JIT_RBAC_APP:-}"
-                if [ -z "${JIT_RBAC_APP}" ]; then
-                  CRONJOB_NAME="${CRONJOB_NAME:-}"
-                  if [ -n "${CRONJOB_NAME}" ]; then
-                    JIT_RBAC_APP=$(kubectl get cronjob -n kube-system "${CRONJOB_NAME}" -o jsonpath='{.metadata.labels.jit-rbac\/app}' 2>/dev/null || echo "")
-                  fi
-                fi
-                if [ -z "${JIT_RBAC_APP}" ]; then
-                  echo "ERROR: JIT_RBAC_APP is not set and cannot be determined from CronJob labels"
-                  exit 1
-                fi
-                echo "Starting cleanup at $(date -u +%FT%TZ) for app: ${JIT_RBAC_APP}";
+                echo "Starting cleanup at $(date)";
+                CRB_EXISTS=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o name 2>/dev/null || echo "");
                 kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
-                echo "Cleanup completed at $(date -u +%FT%TZ)";
+                echo "Cleanup completed at $(date)";
             env:
             - name: JIT_RBAC_APP
-              value: APP_NAME_PLACEHOLDER
-            - name: CRONJOB_NAME
-              value: APP_NAME_PLACEHOLDER-cleanup-cron
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['jit-rbac/app']
