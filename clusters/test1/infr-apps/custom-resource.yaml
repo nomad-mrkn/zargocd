@@ -14,7 +14,7 @@ spec:
     - Validate=false
   project: default
   destination:
-    name: kind-test-3
+    name: kind-test-1
     namespace: kube-system
   source:
     repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
