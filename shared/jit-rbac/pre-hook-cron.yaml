@@ -39,21 +39,7 @@ spec:
                 set -euo pipefail
                 echo "Starting cleanup at $(date -u +%FT%TZ)";
                 
-                PENDING_PODS=$(kubectl get pods -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} \
-                  --field-selector=status.phase=Pending -o jsonpath='{.items[*].metadata.name}' 2>/dev/null || echo "");
-                RUNNING_PODS=$(kubectl get pods -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} \
-                  --field-selector=status.phase=Running -o jsonpath='{.items[*].metadata.name}' 2>/dev/null || echo "");
-                UNKNOWN_PODS=$(kubectl get pods -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} \
-                  --field-selector=status.phase=Unknown -o jsonpath='{.items[*].metadata.name}' 2>/dev/null || echo "");
-                
-                ACTIVE_PODS="${PENDING_PODS} ${RUNNING_PODS} ${UNKNOWN_PODS}"
-                ACTIVE_PODS=$(echo "${ACTIVE_PODS}" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-                
-                if [ -n "${ACTIVE_PODS}" ]; then
-                  echo "Found active pods for ${JIT_RBAC_APP}: ${ACTIVE_PODS}, skipping cleanup to avoid interrupting sync";
-                  exit 0;
-                fi
-
+                CRB_EXISTS=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o name 2>/dev/null || echo "");
                 kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
                 
                 echo "Cleanup completed at $(date -u +%FT%TZ)";
