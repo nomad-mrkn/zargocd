@@ -27,6 +27,6 @@ spec:
         command: ["/bin/sh", "-c"]
         args:
           - |
-            echo "Waiting 10 seconds for RBAC propagation at $(date -u +%FT%TZ)"
-            sleep 10
+            echo "Waiting 3 seconds for RBAC propagation at $(date -u +%FT%TZ)"
+            sleep 3
             echo "Wait completed at $(date -u +%FT%TZ)"
