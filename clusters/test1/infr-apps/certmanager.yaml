@@ -47,7 +47,6 @@ spec:
                 value: k8s-spb2-backend1-certmanager-cleanup-cron
           - target:
               kind: Job
-              labelSelector: jit-rbac/app
             patch: |-
               - op: replace
                 path: /metadata/name
