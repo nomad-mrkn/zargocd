@@ -45,24 +45,12 @@ spec:
               - op: replace
                 path: /metadata/name
                 value: k8s-spb2-backend3-certmanager-cleanup-cron
-              - op: replace
-                path: /metadata/labels/jit-rbac~1app
-                value: k8s-spb2-backend3-certmanager
-              - op: replace
-                path: /spec/jobTemplate/spec/template/metadata/labels/jit-rbac~1app
-                value: k8s-spb2-backend3-certmanager
           - target:
               kind: Job
             patch: |-
               - op: replace
                 path: /metadata/name
                 value: k8s-spb2-backend3-certmanager-cleanup
-              - op: replace
-                path: /metadata/labels/jit-rbac~1app
-                value: k8s-spb2-backend3-certmanager
-              - op: replace
-                path: /spec/template/metadata/labels/jit-rbac~1app
-                value: k8s-spb2-backend3-certmanager
     - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
       targetRevision: HEAD
       path: shared/jit-rbac-roles
