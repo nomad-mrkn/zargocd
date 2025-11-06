@@ -24,12 +24,12 @@ spec:
         commonLabels:
           jit-rbac/app: k8s-spb2-backend3-certmanager
         patches:
-          # - target:
-          #     kind: CronJob
-          #   patch: |-
-          #     - op: replace
-          #       path: /metadata/name
-          #       value: k8s-spb2-backend3-certmanager-cleanup-cron
+          - target:
+              kind: CronJob
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: k8s-spb2-backend3-certmanager-cleanup-cron
           - target:
               kind: ClusterRole
             patch: |-
