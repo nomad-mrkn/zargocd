@@ -27,13 +27,33 @@ spec:
         imagePullPolicy: IfNotPresent
         env:
         - name: JIT_RBAC_APP
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.labels['jit-rbac/app']
+          value: APP_NAME_PLACEHOLDER
         command: ["/bin/sh", "-c"]
         args:
           - |
             set -uo pipefail
+            JIT_RBAC_APP="${JIT_RBAC_APP:-}"
+            if [ -z "${JIT_RBAC_APP}" ] || [ "${JIT_RBAC_APP}" = "APP_NAME_PLACEHOLDER" ]; then
+              JOB_NAME="${JOB_NAME:-}"
+              if [ -z "${JOB_NAME}" ]; then
+                JOB_NAME=$(hostname 2>/dev/null || echo "")
+              fi
+              if [ -n "${JOB_NAME}" ]; then
+                JIT_RBAC_APP=$(kubectl get job -n kube-system "${JOB_NAME}" -o jsonpath='{.metadata.labels.jit-rbac\/app}' 2>/dev/null || echo "")
+              fi
+            fi
+            if [ -z "${JIT_RBAC_APP}" ] || [ "${JIT_RBAC_APP}" = "APP_NAME_PLACEHOLDER" ]; then
+              echo "ERROR: JIT_RBAC_APP is not set and cannot be determined from Job labels";
+              echo "Attempting to get from pod labels...";
+              POD_NAME=$(hostname 2>/dev/null || echo "")
+              if [ -n "${POD_NAME}" ]; then
+                JIT_RBAC_APP=$(kubectl get pod -n kube-system "${POD_NAME}" -o jsonpath='{.metadata.labels.jit-rbac\/app}' 2>/dev/null || echo "")
+              fi
+            fi
+            if [ -z "${JIT_RBAC_APP}" ] || [ "${JIT_RBAC_APP}" = "APP_NAME_PLACEHOLDER" ]; then
+              echo "ERROR: JIT_RBAC_APP is not set. Cannot proceed with cleanup.";
+              exit 1;
+            fi
             echo "Starting PostSync cleanup for ${JIT_RBAC_APP} at $(date -u +%FT%TZ)";
             
             CRB_NAME=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "");
