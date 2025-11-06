@@ -4,7 +4,6 @@ metadata:
   name: ROLE_NAME_PLACEHOLDER
   annotations:
     argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/hook-delete-policy: HookFailed
     argocd.argoproj.io/sync-wave: "-4"
   labels:
     app.kubernetes.io/part-of: argo-jit-rbac
@@ -17,7 +16,6 @@ metadata:
   name: ROLE_NAME_PLACEHOLDER
   annotations:
     argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/hook-delete-policy: HookFailed
     argocd.argoproj.io/sync-wave: "-3"
   labels:
     app.kubernetes.io/part-of: argo-jit-rbac
