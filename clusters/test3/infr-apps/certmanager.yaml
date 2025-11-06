@@ -47,14 +47,14 @@ spec:
                 value: k8s-spb2-backend3-certmanager-cleanup-cron
           - target:
               kind: Job
-              annotationSelector: argocd.argoproj.io/sync-wave=1
+              labelSelector: jit-rbac/type=wait
             patch: |-
               - op: replace
                 path: /metadata/name
                 value: k8s-spb2-backend3-certmanager-wait
           - target:
               kind: Job
-              annotationSelector: argocd.argoproj.io/sync-wave=99
+              labelSelector: jit-rbac/type=cleanup
             patch: |-
               - op: replace
                 path: /metadata/name
