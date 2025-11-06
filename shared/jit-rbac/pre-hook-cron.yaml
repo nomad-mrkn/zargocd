@@ -11,12 +11,12 @@ metadata:
     app.kubernetes.io/part-of: argo-jit-rbac
     jit-rbac/app: APP_NAME_PLACEHOLDER
 spec:
-  schedule: "3/5 * * * *"
+  schedule: "*/5 * * * *"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
   suspend: false
-  startingDeadlineSeconds: 0
+  startingDeadlineSeconds: 10
   jobTemplate:
     spec:
       backoffLimit: 0
