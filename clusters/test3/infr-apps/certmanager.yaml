@@ -52,6 +52,9 @@ spec:
               - op: replace
                 path: /metadata/name
                 value: k8s-spb2-backend3-certmanager-wait
+              - op: replace
+                path: /spec/template/spec/containers/0/env/0/value
+                value: argocd-manager-certmanager
           - target:
               kind: Job
               labelSelector: jit-rbac/type=cleanup

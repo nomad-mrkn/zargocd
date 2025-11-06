@@ -26,9 +26,35 @@ spec:
       - name: wait
         image: bitnami/kubectl:latest
         imagePullPolicy: IfNotPresent
+        env:
+        - name: ROLE_NAME
+          value: "ROLE_NAME_PLACEHOLDER"
         command: ["/bin/sh", "-c"]
         args:
           - |
-            echo "Waiting 3 seconds for RBAC propagation at $(date -u +%FT%TZ)"
-            sleep 3
-            echo "Wait completed at $(date -u +%FT%TZ)"
+            set -euo pipefail
+            echo "Starting RBAC propagation wait at $(date -u +%FT%TZ)"
+            
+            # Ждём 5 секунд для RBAC propagation
+            echo "Waiting 5 seconds for RBAC propagation..."
+            sleep 5
+            
+            # Проверяем, что ClusterRole заполнен правилами
+            echo "Verifying ClusterRole ${ROLE_NAME} has rules..."
+            
+            RULES=$(kubectl get clusterrole "${ROLE_NAME}" -o jsonpath='{.rules}' 2>/dev/null || echo "[]")
+            
+            if [ "${RULES}" = "[]" ] || [ -z "${RULES}" ]; then
+              echo "⚠ WARNING: ClusterRole ${ROLE_NAME} has no rules!"
+              exit 1
+            else
+              echo "✓ ClusterRole ${ROLE_NAME} has rules populated"
+              kubectl get clusterrole "${ROLE_NAME}" -o jsonpath='{.rules[*].resources}' | head -c 100
+              echo "..."
+            fi
+            
+            # Дополнительная пауза для полной propagation
+            echo "Additional 2 seconds for propagation..."
+            sleep 2
+            
+            echo "RBAC propagation completed at $(date -u +%FT%TZ)"
