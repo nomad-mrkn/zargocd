@@ -15,7 +15,7 @@ spec:
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
-  suspend: false
+  suspend: true
   startingDeadlineSeconds: 0
   jobTemplate:
     spec:
