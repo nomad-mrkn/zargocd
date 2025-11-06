@@ -29,33 +29,28 @@ spec:
             args:
               - |
                 set -euo pipefail
+                echo "Starting CRB cleanup at $(date -u +%FT%TZ)"
+
                 AGE_THRESHOLD_MIN=${AGE_THRESHOLD_MIN:-15}
                 WATCHER="argocd-manager-watcher"
                 now_epoch=$(date -u +%s)
-                kubectl get clusterrole -l app.kubernetes.io/part-of=argo-jit-rbac \
-                  -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' 2>/dev/null |
-                while read -r role_name; do
-                  [ -z "${role_name}" ] && continue
-                  [ "${role_name}" = "${WATCHER}" ] && continue
-                  CRB_INFO=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac \
-                    -o jsonpath='{range .items[?(@.roleRef.name=="'${role_name}'")]}{.metadata.name}{"\t"}{.metadata.creationTimestamp}{"\n"}{end}' 2>/dev/null | head -1)
-                  if [ -n "${CRB_INFO}" ]; then
-                    IFS=$'\t' read -r crb_name crb_ct <<< "${CRB_INFO}"
-                    crb_epoch=$(date -u -d "${crb_ct}" +%s 2>/dev/null || \
-                      echo "${crb_ct}" | awk -F'[TZ:-]' '{days=($1-1970)*365+($2-1)*30+($3-1); print days*86400+$4*3600+$5*60}' 2>/dev/null || echo 0)
-                    [ "${crb_epoch}" = "0" ] && continue
-                    age_min=$(( (now_epoch - crb_epoch) / 60 ))
-                    if [ ${age_min} -ge ${AGE_THRESHOLD_MIN} ]; then
-                      timeout 30 kubectl patch clusterrole "${role_name}" --type=merge -p '{"rules": []}' || true
-                      timeout 30 kubectl patch clusterrolebinding "${crb_name}" --type=merge -p '{"metadata":{"finalizers":[]}}' || true
-                      timeout 30 kubectl delete clusterrolebinding "${crb_name}" --ignore-not-found=true --force --grace-period=0 || true
-                    fi
-                  else
-                    RULES_VAL=$(kubectl get clusterrole "${role_name}" -o jsonpath='{.rules}' 2>/dev/null || echo "")
-                    if [ "${RULES_VAL}" != "[]" ] && [ -n "${RULES_VAL}" ]; then
-                      timeout 30 kubectl patch clusterrole "${role_name}" --type=merge -p '{"rules": []}' || true
-                    fi
+
+                kubectl get clusterrolebinding -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.metadata.creationTimestamp}{"\n"}{end}' 2>/dev/null |
+                while IFS=$'\t' read -r crb_name crb_ct; do
+                  [ -z "${crb_name}" ] && continue
+                  [ "${crb_name}" = "${WATCHER}" ] && continue
+
+                  crb_epoch=$(date -u -d "${crb_ct}" +%s 2>/dev/null || echo 0)
+                  [ "${crb_epoch}" = "0" ] && continue
+
+                  age_min=$(( (now_epoch - crb_epoch) / 60 ))
+
+                  if [ ${age_min} -ge ${AGE_THRESHOLD_MIN} ]; then
+                    echo "CRB '${crb_name}' is ${age_min} minutes old, deleting..."
+                    timeout 30 kubectl patch clusterrolebinding "${crb_name}" --type=merge -p '{"metadata":{"finalizers":[]}}' || true
+                    timeout 30 kubectl delete clusterrolebinding "${crb_name}" --ignore-not-found=true --force --grace-period=0 || true
+                    echo "Deleted CRB '${crb_name}'"
                   fi
                 done
-                timeout 30 kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac --field-selector=status.phase=Succeeded --ignore-not-found=true --force --grace-period=0 || true
-                timeout 30 kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac-cron --field-selector=status.phase=Succeeded --ignore-not-found=true --force --grace-period=0 || true
+
+                echo "Completed CRB cleanup at $(date -u +%FT%TZ)"
