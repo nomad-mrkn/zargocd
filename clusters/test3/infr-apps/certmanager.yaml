@@ -35,10 +35,10 @@ spec:
             patch: |-
               - op: replace
                 path: /metadata/name
-                value: argocd-manager-certmanager-install
+                value: argocd-manager-certmanager
               - op: replace
                 path: /roleRef/name
-                value: argocd-manager-certmanager-install
+                value: argocd-manager-certmanager
           - target:
               kind: CronJob
             patch: |-
