@@ -47,14 +47,6 @@ spec:
                 value: argocd-manager-certmanager
           - target:
               kind: Job
-              name: APP_NAME_PLACEHOLDER-rbac-waiter
-            patch: |-
-              - op: replace
-                path: /metadata/name
-                value: k8s-spb2-backend3-certmanager-rbac-waiter
-          - target:
-              kind: Job
-              name: APP_NAME_PLACEHOLDER-cleanup
             patch: |-
               - op: replace
                 path: /metadata/name

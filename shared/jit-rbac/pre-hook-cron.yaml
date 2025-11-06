@@ -6,7 +6,7 @@ metadata:
   annotations:
     argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/hook-delete-policy: HookFailed
-    argocd.argoproj.io/sync-wave: "-2"
+    argocd.argoproj.io/sync-wave: "-1"
   labels:
     app.kubernetes.io/part-of: argo-jit-rbac
     jit-rbac/app: APP_NAME_PLACEHOLDER
@@ -49,36 +49,3 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.labels['jit-rbac/app']
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: ROLE_NAME_PLACEHOLDER
-  annotations:
-    argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/hook-delete-policy: HookFailed
-    argocd.argoproj.io/sync-wave: "-1"
-  labels:
-    app.kubernetes.io/part-of: argo-jit-rbac
-    jit-rbac/app: APP_NAME_PLACEHOLDER
-rules: []
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: ROLE_NAME_PLACEHOLDER
-  annotations:
-    argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/hook-delete-policy: HookFailed
-    argocd.argoproj.io/sync-wave: "-1"
-  labels:
-    app.kubernetes.io/part-of: argo-jit-rbac
-    jit-rbac/app: APP_NAME_PLACEHOLDER
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: ROLE_NAME_PLACEHOLDER
-subjects:
-  - kind: ServiceAccount
-    name: argocd-manager
-    namespace: kube-system
