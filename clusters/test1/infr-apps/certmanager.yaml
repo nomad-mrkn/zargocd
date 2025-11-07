@@ -39,12 +39,6 @@ spec:
               - op: replace
                 path: /roleRef/name
                 value: argocd-manager-certmanager
-          # - target:
-          #     kind: CronJob
-          #   patch: |-
-          #     - op: replace
-          #       path: /metadata/name
-          #       value: k8s-spb2-backend1-certmanager-cleanup-cron
           - target:
               kind: Job
               name: APP_NAME_PLACEHOLDER-cleanup-old-rbac

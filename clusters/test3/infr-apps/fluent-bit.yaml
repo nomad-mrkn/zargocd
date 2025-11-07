@@ -40,12 +40,6 @@ spec:
                 path: /roleRef/name
                 value: argocd-manager-fluent-bit
           - target:
-              kind: CronJob
-            patch: |-
-              - op: replace
-                path: /metadata/name
-                value: k8s-spb2-backend3-fluent-bit-cleanup-cron
-          - target:
               kind: Job
               name: APP_NAME_PLACEHOLDER-cleanup-old-rbac
             patch: |-
