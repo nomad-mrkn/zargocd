@@ -68,51 +68,51 @@ subjects:
   - kind: ServiceAccount
     name: argocd-manager
     namespace: kube-system
----
-apiVersion: batch/v1
-kind: CronJob
-metadata:
-  name: APP_NAME_PLACEHOLDER-cleanup-cron
-  namespace: kube-system
-  annotations:
-    argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/hook-delete-policy: HookFailed
-    argocd.argoproj.io/sync-wave: "-1"
-  labels:
-    app.kubernetes.io/part-of: argo-jit-rbac
-    jit-rbac/app: APP_NAME_PLACEHOLDER
-spec:
-  schedule: "*/5 * * * *"
-  successfulJobsHistoryLimit: 1
-  failedJobsHistoryLimit: 1
-  concurrencyPolicy: Forbid
-  suspend: false
-  startingDeadlineSeconds: 0
-  jobTemplate:
-    spec:
-      backoffLimit: 0
-      ttlSecondsAfterFinished: 300
-      template:
-        metadata:
-          labels:
-            app.kubernetes.io/part-of: argo-jit-rbac
-            jit-rbac/app: APP_NAME_PLACEHOLDER
-        spec:
-          serviceAccountName: argocd-manager
-          restartPolicy: Never
-          containers:
-          - name: cleanup
-            image: bitnami/kubectl:latest
-            imagePullPolicy: IfNotPresent
-            command: ["/bin/sh", "-c"]
-            args:
-              - |
-                echo "Starting cleanup at $(date)";
-                CRB_EXISTS=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o name 2>/dev/null || echo "");
-                kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
-                echo "Cleanup completed at $(date)";
-            env:
-            - name: JIT_RBAC_APP
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.labels['jit-rbac/app']
+# ---
+# apiVersion: batch/v1
+# kind: CronJob
+# metadata:
+#   name: APP_NAME_PLACEHOLDER-cleanup-cron
+#   namespace: kube-system
+#   annotations:
+#     argocd.argoproj.io/hook: PreSync
+#     argocd.argoproj.io/hook-delete-policy: HookFailed
+#     argocd.argoproj.io/sync-wave: "-1"
+#   labels:
+#     app.kubernetes.io/part-of: argo-jit-rbac
+#     jit-rbac/app: APP_NAME_PLACEHOLDER
+# spec:
+#   schedule: "*/5 * * * *"
+#   successfulJobsHistoryLimit: 1
+#   failedJobsHistoryLimit: 1
+#   concurrencyPolicy: Forbid
+#   suspend: false
+#   startingDeadlineSeconds: 0
+#   jobTemplate:
+#     spec:
+#       backoffLimit: 0
+#       ttlSecondsAfterFinished: 300
+#       template:
+#         metadata:
+#           labels:
+#             app.kubernetes.io/part-of: argo-jit-rbac
+#             jit-rbac/app: APP_NAME_PLACEHOLDER
+#         spec:
+#           serviceAccountName: argocd-manager
+#           restartPolicy: Never
+#           containers:
+#           - name: cleanup
+#             image: bitnami/kubectl:latest
+#             imagePullPolicy: IfNotPresent
+#             command: ["/bin/sh", "-c"]
+#             args:
+#               - |
+#                 echo "Starting cleanup at $(date)";
+#                 CRB_EXISTS=$(kubectl get clusterrolebinding -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} -o name 2>/dev/null || echo "");
+#                 kubectl delete pod -n kube-system -l app.kubernetes.io/part-of=argo-jit-rbac,jit-rbac/app=${JIT_RBAC_APP} --field-selector=status.phase=Succeeded --ignore-not-found=true || true;
+#                 echo "Cleanup completed at $(date)";
+#             env:
+#             - name: JIT_RBAC_APP
+#               valueFrom:
+#                 fieldRef:
+#                   fieldPath: metadata.labels['jit-rbac/app']
