@@ -1,0 +1,75 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: k8s-spb2-backend1-certmanager
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+    - CreateNamespace=true
+    - FailOnSharedResource=false
+  project: default
+  destination:
+    name: kind-test-1
+    namespace: cert-manager
+  sources:
+    - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+      targetRevision: HEAD
+      path: shared/jit-rbac
+      kustomize:
+        commonLabels:
+          jit-rbac/app: k8s-spb2-backend1-certmanager
+        patches:
+          - target:
+              kind: ClusterRole
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: argocd-manager-certmanager
+          - target:
+              kind: ClusterRoleBinding
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: argocd-manager-certmanager
+              - op: replace
+                path: /roleRef/name
+                value: argocd-manager-certmanager
+          # - target:
+          #     kind: CronJob
+          #   patch: |-
+          #     - op: replace
+          #       path: /metadata/name
+          #       value: k8s-spb2-backend1-certmanager-cleanup-cron
+          - target:
+              kind: Job
+              name: APP_NAME_PLACEHOLDER-cleanup-old-rbac
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: k8s-spb2-backend1-certmanager-cleanup-old-rbac
+          - target:
+              kind: Job
+              name: APP_NAME_PLACEHOLDER-cleanup
+            patch: |-
+              - op: replace
+                path: /metadata/name
+                value: k8s-spb2-backend1-certmanager-cleanup
+    - repoURL: 'https://github.com/nomad-mrkn/zargocd.git'
+      targetRevision: HEAD
+      path: shared/jit-rbac-roles
+      directory:
+        include: certmanager-role.yaml
+    - repoURL: 'https://github.com/nomad-mrkn/charts.git'
+      targetRevision: HEAD
+      path: cert-manager
+      helm:
+        releaseName: k8s-spb2-backend1-certmanager
+        values: |
+          installCRDs: true
+          startupapicheck:
+           enabled: false
