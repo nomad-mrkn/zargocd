@@ -32,7 +32,9 @@ spec:
             echo "Cleaning up old RBAC resources at $(date -u +%FT%TZ)"
             
             kubectl delete clusterrolebinding argocd-manager-role-binding --ignore-not-found=true || true
-            kubectl delete clusterrole argocd-manager-role --ignore-not-found=true || true
+            timeout 30 kubectl patch clusterrole argocd-manager-role --type=merge -p '{"rules": []}' 2>/dev/null || true
+            timeout 30 kubectl patch clusterrole argocd-manager-role --type=merge -p '{"metadata":{"finalizers":[]}}' 2>/dev/null || true
+            timeout 30 kubectl delete clusterrole argocd-manager-role --ignore-not-found=true --force --grace-period=0 || true
             
             echo "Old RBAC cleanup completed at $(date -u +%FT%TZ)"
 ---
